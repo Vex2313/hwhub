@@ -159,6 +159,36 @@ const DEFAULT_GAMES = [
     path: "games/castlevania/index.html",
     thumb: "games/castlevania/thumb.png",
     size: "4 MB"
+  },
+  {
+    id: "slope",
+    title: "Slope",
+    category: "arcade",
+    tags: ["3D", "WebGL", "Бесконечная", "Хардкор"],
+    desc: "Культовый неоновый 3D-раннер: управляйте катящимся шаром по бесконечному процедурному склону на сумасшедшей скорости, уворачиваясь от препятствий.",
+    path: "games/slope/index.html",
+    thumb: "games/slope/thumb.jpeg",
+    size: "10 MB"
+  },
+  {
+    id: "cookie-clicker",
+    title: "Cookie Clicker",
+    category: "arcade",
+    tags: ["Кликер", "Бесконечная", "Залипалка", "Культ"],
+    desc: "Самый залипательный кликер всех времён: выпекайте триллионы печений, нанимайте бабушек, стройте фермы и межпространственные фабрики.",
+    path: "games/cookie-clicker/index.html",
+    thumb: "games/cookie-clicker/thumb.png",
+    size: "13 MB"
+  },
+  {
+    id: "stack",
+    title: "Stack 3D",
+    category: "arcade",
+    tags: ["3D", "WebGL", "Физика", "Залипалка"],
+    desc: "Медитативная бесконечная 3D-башня: вовремя ставьте скользящие блоки, срезайте лишнее и стройте башню до самых небес.",
+    path: "games/stack/index.html",
+    thumb: "games/stack/thumb.png",
+    size: "1 MB"
   }
 ];
 
