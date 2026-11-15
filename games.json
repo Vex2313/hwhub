@@ -75,5 +75,16 @@
     "thumb": "games/disgaea/thumb.png",
     "size": "34 MB",
     "offline": true
+  },
+  {
+    "id": "subway",
+    "title": "Subway Surfers",
+    "category": "arcade",
+    "tags": ["3D", "Раннер", "Хит"],
+    "desc": "Официальная веб-версия культового раннера San Francisco. Прыгайте по поездам, собирайте монеты и ставьте рекорды.",
+    "path": "games/subway/index.html",
+    "thumb": "games/subway/thumb.png",
+    "size": "55 MB",
+    "offline": true
   }
 ]
