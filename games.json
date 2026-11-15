@@ -130,5 +130,49 @@
     "thumb": "games/pacman/thumb.svg",
     "size": "< 1 MB",
     "offline": true
+  },
+  {
+    "id": "phoenix-wright",
+    "title": "Phoenix Wright: Ace Attorney",
+    "category": "story",
+    "tags": ["NDS", "Детектив", "Новелла", "Культ"],
+    "desc": "Культовая судебная новелла: расследуйте преступления, ищите улики, допрашивайте свидетелей и кричите «OBJECTION!», защищая невиновных.",
+    "path": "games/phoenix-wright/index.html",
+    "thumb": "games/phoenix-wright/thumb.jpg",
+    "size": "39 MB",
+    "offline": true
+  },
+  {
+    "id": "fire-emblem",
+    "title": "Fire Emblem: The Sacred Stones",
+    "category": "story",
+    "tags": ["GBA", "Тактика", "RPG", "Шедевр"],
+    "desc": "Вершина тактических RPG: королевские династии, предательства, магия, тактические битвы на сетке и перманентная смерть героев.",
+    "path": "games/fire-emblem/index.html",
+    "thumb": "games/fire-emblem/thumb.jpg",
+    "size": "14 MB",
+    "offline": true
+  },
+  {
+    "id": "chrono-trigger",
+    "title": "Chrono Trigger",
+    "category": "story",
+    "tags": ["SNES", "JRPG", "Культ", "Шедевр"],
+    "desc": "Признанный шедевр ролевых игр: путешествия во времени, арт от Акиры Ториямы, легендарная музыка и множество концовок.",
+    "path": "games/chrono-trigger/index.html",
+    "thumb": "games/chrono-trigger/thumb.jpg",
+    "size": "3 MB",
+    "offline": true
+  },
+  {
+    "id": "castlevania",
+    "title": "Castlevania: Aria of Sorrow",
+    "category": "story",
+    "tags": ["GBA", "Action-RPG", "Метроидвания", "Культ"],
+    "desc": "Лучшая часть портативной Кастлвании: Сома Круз в замке Дракулы, поглощение душ монстров, готическая атмосфера и динамичные бои.",
+    "path": "games/castlevania/index.html",
+    "thumb": "games/castlevania/thumb.png",
+    "size": "4 MB",
+    "offline": true
   }
 ]

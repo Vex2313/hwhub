@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Phoenix Wright: Ace Attorney — Nintendo DS — HW Hub</title>
+  <link rel="stylesheet" href="../../emulator/data/emulator.min.css?v=2">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #090a0f;
+      color: #f1f5f9;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .topbar {
+      height: 44px;
+      background: #11141e;
+      border-bottom: 1px solid #1f2536;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 14px;
+      z-index: 50;
+      flex-shrink: 0;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .back-btn {
+      background: #1b202e;
+      color: #cbd5e1;
+      border: 1px solid #2d374d;
+      padding: 4px 10px;
+      border-radius: 4px;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 500;
+      transition: background 0.15s;
+    }
+    .back-btn:hover { background: #262e45; color: #fff; }
+
+    .game-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #e2e8f0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .badge-nds {
+      background: #0284c7;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 3px;
+      letter-spacing: 0.5px;
+    }
+
+    .controls-hint {
+      font-size: 12px;
+      color: #94a3b8;
+      display: flex;
+      gap: 12px;
+    }
+
+    .controls-hint kbd {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #f8fafc;
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-family: monospace;
+      font-size: 11px;
+    }
+
+    #game-container {
+      flex: 1;
+      width: 100%;
+      height: calc(100vh - 44px);
+      position: relative;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #game {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-left">
+      <a href="../../index.html" class="back-btn">&larr; Назад в хаб</a>
+      <span class="badge-nds">NDS</span>
+      <h1 class="game-title">Phoenix Wright: Ace Attorney</h1>
+    </div>
+    <div class="controls-hint">
+      <span>Управление: <kbd>Стрелки</kbd> / <kbd>WASD</kbd></span>
+      <span>A: <kbd>X</kbd></span>
+      <span>B: <kbd>Z</kbd></span>
+      <span>Нижний экран: <kbd>Мышь / Тач</kbd></span>
+    </div>
+  </header>
+
+  <main id="game-container">
+    <div id="game"></div>
+  </main>
+
+  <script>
+    if (window.self !== window.top) {
+      const tb = document.querySelector('.topbar');
+      if (tb) tb.style.display = 'none';
+      const gc = document.getElementById('game-container');
+      if (gc) gc.style.height = '100vh';
+    }
+
+    window.addEventListener('keydown', (e) => {
+      const panicKey = localStorage.getItem('hwhub_panic_key') || '\\';
+      const panicAction = localStorage.getItem('hwhub_panic_action') || 'decoy';
+
+      if (e.key === panicKey) {
+        e.preventDefault();
+        if (panicAction === 'dnevnik') {
+          window.location.replace('https://dnevnik.ru');
+        } else if (panicAction === 'wiki') {
+          window.location.replace('https://ru.wikipedia.org/wiki/Информатика');
+        } else if (panicAction === 'ege') {
+          window.location.replace('https://inf-ege.sdamgia.ru/');
+        } else {
+          window.location.href = '../../index.html';
+        }
+      }
+    });
+
+    window.EJS_player = '#game';
+    window.EJS_core = 'desmume2015';
+    window.EJS_gameName = 'Phoenix Wright - Ace Attorney';
+    window.EJS_gameUrl = 'game.zip';
+    window.EJS_pathtodata = '../../emulator/data/';
+    window.EJS_startOnLoaded = true;
+    window.EJS_language = 'en-US';
+    window.EJS_disableAutoLang = true;
+    window.EJS_color = '#0284c7';
+  </script>
+  <script src="../../emulator/data/emulator.min.js?v=2"></script>
+  <script src="../../emulator/data/loader.js?v=2"></script>
+</body>
+</html>
