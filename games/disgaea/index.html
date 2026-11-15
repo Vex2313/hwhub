@@ -121,6 +121,14 @@
   </main>
 
   <script>
+    // Hide redundant topbar if running inside the Hub's iframe
+    if (window.self !== window.top) {
+      const tb = document.querySelector('.topbar');
+      if (tb) tb.style.display = 'none';
+      const gc = document.getElementById('game-container');
+      if (gc) gc.style.height = '100vh';
+    }
+
     // Panic key handler from parent localStorage configuration
     window.addEventListener('keydown', (e) => {
       const panicKey = localStorage.getItem('hwhub_panic_key') || '\\';
