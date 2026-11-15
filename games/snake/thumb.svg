@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240" width="400" height="240">
+  <defs>
+    <radialGradient id="bgGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#0f281e"/>
+      <stop offset="100%" stop-color="#050807"/>
+    </radialGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+  <rect width="100%" height="100%" fill="url(#bgGlow)"/>
+  <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+    <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#163828" stroke-width="0.8" opacity="0.4"/>
+  </pattern>
+  <rect width="100%" height="100%" fill="url(#grid)"/>
+  
+  <!-- Snake Body -->
+  <g filter="url(#glow)">
+    <rect x="80" y="140" width="18" height="18" rx="3" fill="#22c55e" opacity="0.6"/>
+    <rect x="100" y="140" width="18" height="18" rx="3" fill="#22c55e" opacity="0.7"/>
+    <rect x="120" y="140" width="18" height="18" rx="3" fill="#22c55e" opacity="0.8"/>
+    <rect x="140" y="140" width="18" height="18" rx="3" fill="#22c55e" opacity="0.85"/>
+    <rect x="140" y="120" width="18" height="18" rx="3" fill="#22c55e" opacity="0.9"/>
+    <rect x="140" y="100" width="18" height="18" rx="3" fill="#22c55e"/>
+    <rect x="160" y="100" width="18" height="18" rx="3" fill="#22c55e"/>
+    <rect x="180" y="100" width="18" height="18" rx="3" fill="#22c55e"/>
+    <rect x="200" y="100" width="18" height="18" rx="3" fill="#22c55e"/>
+    <rect x="220" y="100" width="18" height="18" rx="3" fill="#22c55e"/>
+    <!-- Head -->
+    <rect x="240" y="100" width="18" height="18" rx="4" fill="#4ade80"/>
+    <circle cx="253" cy="105" r="2.5" fill="#052e16"/>
+    <circle cx="253" cy="113" r="2.5" fill="#052e16"/>
+    <!-- Food Apple -->
+    <circle cx="310" cy="109" r="8" fill="#ef4444"/>
+    <path d="M 310 101 Q 314 96 318 97" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round"/>
+  </g>
+
+  <!-- Title overlay -->
+  <text x="200" y="195" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="800" font-size="22" fill="#4ade80" letter-spacing="3" opacity="0.95">RETRO SNAKE</text>
+  <text x="200" y="215" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="500" font-size="11" fill="#86efac" letter-spacing="1" opacity="0.6">CLASSIC ARCADE</text>
+</svg>

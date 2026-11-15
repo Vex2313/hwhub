@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Pacman Classic</title>
+    
+    <style type="text/css">
+      @font-face {
+	    font-family: 'BDCartoonShoutRegular';
+        src: url('BD_Cartoon_Shout-webfont.ttf') format('truetype');
+	    font-weight: normal;
+	    font-style: normal;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        background: #090a0f;
+        color: #f1f5f9;
+        font-family: sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+      }
+      #pacman {
+        height: 450px;
+        width: 342px;
+        margin: 10px auto;
+        border-radius: 4px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+      }
+      #shim { 
+        font-family: BDCartoonShoutRegular; 
+        position: absolute;
+        visibility: hidden;
+      }
+      h1 { font-family: BDCartoonShoutRegular; text-align: center; font-size: 20px; color: #fbbf24; margin-bottom: 4px; }
+      .hints { font-size: 12px; color: #94a3b8; text-align: center; }
+    </style>
+    <script>
+      window.addEventListener('keydown', (e) => {
+        const panicKey = localStorage.getItem('hwhub_panic_key') || '\\';
+        const panicAction = localStorage.getItem('hwhub_panic_action') || 'decoy';
+        if (e.key === panicKey) {
+          e.preventDefault();
+          if (panicAction === 'dnevnik') window.location.replace('https://dnevnik.ru');
+          else if (panicAction === 'wiki') window.location.replace('https://ru.wikipedia.org/wiki/Информатика');
+          else if (panicAction === 'ege') window.location.replace('https://inf-ege.sdamgia.ru/');
+          else window.location.href = '../../index.html';
+        }
+      });
+    </script>
+</head>
+
+<body>
+  <div id="shim">shim for font face</div>
+  <h1>PACMAN</h1>
+  <div class="hints">Управление: Стрелки / N: Новая игра / P: Пауза</div>
+  <div id="pacman"></div>
+  <script src="pacman.js"></script>
+  <script src="modernizr-1.5.min.js"></script>
+
+  <script>
+
+    var el = document.getElementById("pacman");
+
+    if (Modernizr.canvas && Modernizr.localstorage && 
+        Modernizr.audio && (Modernizr.audio.ogg || Modernizr.audio.mp3)) {
+      window.setTimeout(function () { PACMAN.init(el, "./"); }, 0);
+    } else { 
+      el.innerHTML = "Sorry, needs a decent browser<br /><small>" + 
+        "(firefox 3.6+, Chrome 4+, Opera 10+ and Safari 4+)</small>";
+    }
+  </script>
+
+</body>
+</html>

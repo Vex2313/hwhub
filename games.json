@@ -50,7 +50,7 @@
     "tags": ["Ретро", "Аркада"],
     "desc": "Минималистичная змейка с сохранением рекордов. Ничего лишнего, запускается мгновенно.",
     "path": "games/snake/index.html",
-    "thumb": "",
+    "thumb": "games/snake/thumb.svg",
     "size": "50 KB",
     "offline": true
   },
@@ -85,6 +85,50 @@
     "path": "games/subway/index.html",
     "thumb": "games/subway/thumb.png",
     "size": "55 MB",
+    "offline": true
+  },
+  {
+    "id": "drive-mad",
+    "title": "Drive Mad",
+    "category": "arcade",
+    "tags": ["3D", "Гонки", "Физика"],
+    "desc": "Популярнейшие физические гонки на выживание. Балансируйте на грузовиках, преодолевайте препятствия и пройдите 100 уровней.",
+    "path": "games/drive-mad/index.html",
+    "thumb": "games/drive-mad/webapp/cover.jpg",
+    "size": "3 MB",
+    "offline": true
+  },
+  {
+    "id": "doodle-jump",
+    "title": "Doodle Jump",
+    "category": "arcade",
+    "tags": ["Аркада", "Классика", "Прыжки"],
+    "desc": "Полная версия Дудл-джампа со всеми 10 темами оформления (Космос, Джунгли, Ниндзя) и звуками. Прыгайте выше всех!",
+    "path": "games/doodle-jump/index.html",
+    "thumb": "games/doodle-jump/img/icon.png",
+    "size": "11 MB",
+    "offline": true
+  },
+  {
+    "id": "vex3",
+    "title": "Vex 3",
+    "category": "arcade",
+    "tags": ["Паркур", "Платформер", "Хардкор"],
+    "desc": "Культовый стикмен-платформер с лабиринтами, пилами, скольжением по стенам и чекпоинтами.",
+    "path": "games/vex3/index.html",
+    "thumb": "games/vex3/thumb.jpeg",
+    "size": "5 MB",
+    "offline": true
+  },
+  {
+    "id": "pacman",
+    "title": "Pac-Man Classic",
+    "category": "retro",
+    "tags": ["Ретро", "Аркада", "Лабиринт"],
+    "desc": "Аутентичный Пакман на Canvas с классическим ИИ призраков, фруктами, бонусами и оригинальным звуком.",
+    "path": "games/pacman/index.html",
+    "thumb": "games/pacman/thumb.svg",
+    "size": "< 1 MB",
     "offline": true
   }
 ]
