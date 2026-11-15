@@ -1,0 +1,68 @@
+[
+  {
+    "id": "lltq",
+    "title": "Long Live The Queen",
+    "category": "story",
+    "tags": ["Visual Novel", "RPG", "Стратегия"],
+    "desc": "Управляйте принцессой Элоди, балансируйте между интригами двора, учите науки и выживите до коронации.",
+    "path": "games/lltq/index.html",
+    "thumb": "games/lltq/web-presplash.jpg",
+    "size": "90 MB",
+    "offline": true
+  },
+  {
+    "id": "2048",
+    "title": "2048",
+    "category": "puzzle",
+    "tags": ["Головоломка", "Логика"],
+    "desc": "Сдвигайте плитки с одинаковыми числами, объединяйте их и попробуйте собрать число 2048.",
+    "path": "games/2048/index.html",
+    "thumb": "games/2048/meta/apple-touch-icon.png",
+    "size": "< 1 MB",
+    "offline": true
+  },
+  {
+    "id": "hextris",
+    "title": "Hextris",
+    "category": "arcade",
+    "tags": ["Аркада", "Реакция"],
+    "desc": "Шестиугольный Тетрис на реакцию. Вращайте платформу и собирайте блоки одного цвета по 3 в ряд.",
+    "path": "games/hextris/index.html",
+    "thumb": "games/hextris/images/icons/apple-touch-180.png",
+    "size": "1 MB",
+    "offline": true
+  },
+  {
+    "id": "tetris",
+    "title": "Tetris Classic",
+    "category": "retro",
+    "tags": ["Ретро", "Классика"],
+    "desc": "Классический Тетрис на HTML5 Canvas: чистая физика, таблица очков и максимальная производительность.",
+    "path": "games/tetris/index.html",
+    "thumb": "games/tetris/texture.jpg",
+    "size": "< 1 MB",
+    "offline": true
+  },
+  {
+    "id": "snake",
+    "title": "Retro Snake",
+    "category": "retro",
+    "tags": ["Ретро", "Аркада"],
+    "desc": "Минималистичная змейка с сохранением рекордов. Ничего лишнего, запускается мгновенно.",
+    "path": "games/snake/index.html",
+    "thumb": "",
+    "size": "50 KB",
+    "offline": true
+  },
+  {
+    "id": "flappy",
+    "title": "Floppy Bird",
+    "category": "arcade",
+    "tags": ["Аркада", "Хардкор"],
+    "desc": "Тот самый Flappy Bird без рекламы и с чистым откликом на клики и пробел.",
+    "path": "games/flappy/index.html",
+    "thumb": "games/flappy/assets/thumb.png",
+    "size": "< 1 MB",
+    "offline": true
+  }
+]
