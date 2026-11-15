@@ -189,6 +189,46 @@ const DEFAULT_GAMES = [
     path: "games/stack/index.html",
     thumb: "games/stack/thumb.png",
     size: "1 MB"
+  },
+  {
+    id: "pokemon-emerald",
+    title: "Pokémon Emerald",
+    category: "story",
+    tags: ["GBA", "RPG", "Покемоны", "Культ"],
+    desc: "Легендарное приключение в регионе Хоэнн: ловите покемонов, побеждайте гим-лидеров, остановите команды Магма и Аква и покорите Боевой Рубеж.",
+    path: "games/pokemon-emerald/index.html",
+    thumb: "games/pokemon-emerald/thumb.png",
+    size: "7 MB"
+  },
+  {
+    id: "super-mario-world",
+    title: "Super Mario World",
+    category: "arcade",
+    tags: ["SNES", "Платформер", "Классика", "Культ"],
+    desc: "Шедевр платформеров на все времена: спасите Принцессу Пич, исследуйте Динозавриный остров верхом на Йоши и находите тайные выходы.",
+    path: "games/super-mario-world/index.html",
+    thumb: "games/super-mario-world/thumb.png",
+    size: "< 1 MB"
+  },
+  {
+    id: "zelda-minish-cap",
+    title: "The Legend of Zelda: The Minish Cap",
+    category: "story",
+    tags: ["GBA", "Приключение", "RPG", "Шедевр"],
+    desc: "Одна из лучших частей Зельды: волшебная говорящая шляпа Эзло, уменьшение до размера пикси, подземелья, головоломки и эпические битвы.",
+    path: "games/zelda-minish-cap/index.html",
+    thumb: "games/zelda-minish-cap/thumb.jpg",
+    size: "10 MB"
+  },
+  {
+    id: "cut-the-rope",
+    title: "Cut the Rope",
+    category: "puzzle",
+    tags: ["Головоломка", "Физика", "Хит", "Ам Ням"],
+    desc: "Официальная веб-версия легендарной физической головоломки: перерезайте веревки, лопайте пузыри, собирайте звезды и кормите сладостями Ам Няма.",
+    path: "games/cut-the-rope/index.html",
+    thumb: "games/cut-the-rope/thumb.jpg",
+    size: "28 MB"
   }
 ];
 
