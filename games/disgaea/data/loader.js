@@ -75,8 +75,10 @@
         }
         await loadStyle("emulator.css");
     } else {
-        await loadScript("emulator.min.js");
-        await loadStyle("emulator.min.css");
+        if (typeof window.EmulatorJS === "undefined") {
+            await loadScript("emulator.min.js?v=2");
+            await loadStyle("emulator.min.css?v=2");
+        }
     }
     const config = {};
     config.gameUrl = window.EJS_gameUrl;
@@ -128,7 +130,7 @@
     try {
         systemLang = Intl.DateTimeFormat().resolvedOptions().locale;
     } catch(e) {} //Ignore
-    if ((typeof window.EJS_language === "string" && window.EJS_language !== "en-US") || (systemLang && window.EJS_disableAutoLang !== false)) {
+    if (window.EJS_disableAutoLang !== true && window.EJS_language !== "en-US" && typeof window.EJS_language === "string") {
         const language = window.EJS_language || systemLang;
         try {
             let path;
