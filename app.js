@@ -59,6 +59,16 @@ const DEFAULT_GAMES = [
     path: "games/flappy/index.html",
     thumb: "games/flappy/assets/thumb.png",
     size: "< 1 MB"
+  },
+  {
+    id: "disgaea",
+    title: "Disgaea DS",
+    category: "story",
+    tags: ["NDS", "RPG", "Тактика", "Шедевр"],
+    desc: "Легендарная тактическая RPG от Nippon Ichi Software на Nintendo DS. Юмор, демоны, бесконечная прокачка и поддержка сенсорного экрана.",
+    path: "games/disgaea/index.html",
+    thumb: "games/disgaea/thumb.png",
+    size: "34 MB"
   }
 ];
 
