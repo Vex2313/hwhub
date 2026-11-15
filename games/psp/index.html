@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PSP Emulator (PPSSPP) — HW Hub</title>
+  <!-- Enables SharedArrayBuffer on GitHub Pages for multithreaded WASM -->
+  <script src="coi-serviceworker.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #090a0f;
+      color: #f1f5f9;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Top bar */
+    .topbar {
+      height: 48px;
+      background: #12151f;
+      border-bottom: 1px solid #1f2536;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      gap: 12px;
+      z-index: 10;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .back-btn {
+      background: #1c2233;
+      color: #cbd5e1;
+      border: 1px solid #2d374d;
+      padding: 5px 12px;
+      border-radius: 4px;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      transition: background 0.15s;
+    }
+    .back-btn:hover { background: #262e45; color: #fff; }
+
+    .title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #38bdf8;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-load {
+      background: #2563eb;
+      color: #fff;
+      border: 1px solid #3b82f6;
+      padding: 6px 14px;
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.15s;
+    }
+    .btn-load:hover { background: #1d4ed8; }
+
+    /* Main Container */
+    #main-container {
+      flex: 1;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #000;
+    }
+
+    /* Drop Zone / Setup Prompt */
+    #drop-zone {
+      max-width: 650px;
+      width: 90%;
+      background: #11141e;
+      border: 2px dashed #2d374d;
+      border-radius: 8px;
+      padding: 36px 24px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    #drop-zone.dragover {
+      border-color: #38bdf8;
+      background: #161b29;
+    }
+
+    .drop-icon {
+      font-size: 48px;
+      line-height: 1;
+    }
+
+    .drop-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #f8fafc;
+    }
+
+    .drop-desc {
+      font-size: 13px;
+      color: #94a3b8;
+      line-height: 1.6;
+      max-width: 500px;
+    }
+
+    .notice-box {
+      background: rgba(37, 99, 235, 0.1);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      padding: 10px 14px;
+      border-radius: 6px;
+      font-size: 12px;
+      color: #93c5fd;
+      text-align: left;
+      line-height: 1.5;
+    }
+
+    .btn-secondary {
+      background: #1e2433;
+      color: #cbd5e1;
+      border: 1px solid #333f59;
+      padding: 8px 16px;
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    .btn-secondary:hover { background: #283045; color: #fff; }
+
+    /* Game Screen */
+    #game-wrapper {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      display: none;
+      background: #000;
+    }
+
+    #game {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation & Actions -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <a href="../../index.html" class="back-btn">← Назад в хаб</a>
+      <span class="title">🎮 Sony PlayStation Portable (PPSSPP)</span>
+    </div>
+    <div class="topbar-actions">
+      <input type="file" id="file-input" accept=".iso,.cso,.pbp,.zip" style="display:none;">
+      <button class="btn-load" id="btn-pick-file">📂 Запустить ISO / CSO</button>
+    </div>
+  </header>
+
+  <!-- Main View -->
+  <main id="main-container">
+    <!-- Drag & Drop / Initial Screen -->
+    <div id="drop-zone">
+      <div class="drop-icon">💿</div>
+      <h2 class="drop-title">Перетащите образ игры сюда</h2>
+      <p class="drop-desc">
+        Поддерживаются файлы <b>.ISO</b>, <b>.CSO</b> и <b>.PBP</b> (например, скачанный <i>Disney G-Force</i>).
+      </p>
+
+      <div class="notice-box">
+        ℹ️ <b>Почему запуск локальный?</b><br>
+        Игры для PSP весят от 500 МБ до 1.5 ГБ. GitHub не позволяет загружать файлы крупнее 100 МБ.
+        Благодаря локальному запуску вы можете хранить ISO на обычной флешке или в папке «Загрузки» на ПК — игра запустится <b>мгновенно и без расхода интернет-трафика</b>.
+      </div>
+
+      <div style="display: flex; gap: 10px; margin-top: 6px;">
+        <button class="btn-load" onclick="document.getElementById('file-input').click()">
+          Выбрать файл с диска / флешки
+        </button>
+        <button class="btn-secondary" id="btn-boot-empty" title="Запустить эмулятор без предустановленного диска">
+          Меню PPSSPP
+        </button>
+      </div>
+    </div>
+
+    <!-- Active Emulator Canvas -->
+    <div id="game-wrapper">
+      <div id="game"></div>
+    </div>
+  </main>
+
+  <script>
+    const fileInput = document.getElementById('file-input');
+    const btnPickFile = document.getElementById('btn-pick-file');
+    const dropZone = document.getElementById('drop-zone');
+    const gameWrapper = document.getElementById('game-wrapper');
+    const btnBootEmpty = document.getElementById('btn-boot-empty');
+
+    let emulatorStarted = false;
+
+    btnPickFile.addEventListener('click', () => fileInput.click());
+
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) startWithFile(file);
+    });
+
+    btnBootEmpty.addEventListener('click', () => {
+      startEmulator(null, 'PPSSPP Dashboard');
+    });
+
+    // Drag and drop handlers
+    window.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.classList.add('dragover');
+    });
+
+    window.addEventListener('dragleave', (e) => {
+      if (!e.relatedTarget) {
+        dropZone.classList.remove('dragover');
+      }
+    });
+
+    window.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('dragover');
+      if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+        startWithFile(e.dataTransfer.files[0]);
+      }
+    });
+
+    function startWithFile(file) {
+      const blobUrl = URL.createObjectURL(file);
+      startEmulator(blobUrl, file.name);
+    }
+
+    function startEmulator(gameUrl, gameName) {
+      if (emulatorStarted) return;
+      emulatorStarted = true;
+
+      dropZone.style.display = 'none';
+      gameWrapper.style.display = 'block';
+
+      window.EJS_player = '#game';
+      window.EJS_core = 'psp';
+      window.EJS_pathtodata = 'data/';
+      window.EJS_threads = true;
+      window.EJS_gameName = gameName || 'PSP Game';
+      window.EJS_startOnLoaded = true;
+
+      if (gameUrl) {
+        window.EJS_gameUrl = gameUrl;
+      }
+
+      // Append loader script
+      const script = document.createElement('script');
+      script.src = 'data/loader.js';
+      document.body.appendChild(script);
+    }
+  </script>
+</body>
+</html>

@@ -10,3 +10,9 @@ desktop.ini
 # Temp files
 *.tmp
 temp_*
+
+# ROM files (Files > 100MB exceed GitHub's upload limit)
+*.iso
+*.cso
+*.pbp
+*.chd

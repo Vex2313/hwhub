@@ -59,6 +59,16 @@ const DEFAULT_GAMES = [
     path: "games/flappy/index.html",
     thumb: "games/flappy/assets/thumb.png",
     size: "< 1 MB"
+  },
+  {
+    id: "psp",
+    title: "Sony PSP (PPSSPP Web)",
+    category: "retro",
+    tags: ["Эмулятор", "PSP", "3D"],
+    desc: "Полноценный эмулятор PlayStation Portable. Запускайте образы игр (.ISO, .CSO, .PBP) прямо с диска или флешки без интернета.",
+    path: "games/psp/index.html",
+    thumb: "",
+    size: "15 MB"
   }
 ];
 
