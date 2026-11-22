@@ -1,0 +1,409 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="Культовая классика Touhou Project эпохи NEC PC-98 (1996–1999): TH01 Highly Responsive to Prayers, TH02 Story of Eastern Wonderland, TH03 Phantasmagoria of Dim. Dream, TH04 Lotus Land Story (Bad Apple), TH05 Mystic Square. Эмулятор Neko Project II (WASM)." />
+  <title>Touhou PC-98 Anthology (TH01–TH05) — HW Hub</title>
+  <link rel="icon" type="image/png" href="thumb.png">
+  <script>
+    // Tab Cloaking Sync
+    (function() {
+      const PRESETS = {
+        classroom: { title: "Google Класс", icon: "https://ssl.gstatic.com/classroom/favicon.png" },
+        dnevnik: { title: "Электронный дневник", icon: "https://dnevnik.ru/favicon.ico" },
+        resh: { title: "РЭШ — Российская электронная школа", icon: "https://resh.edu.ru/favicon.ico" },
+        wiki: { title: "Википедия — свободная энциклопедия", icon: "https://ru.wikipedia.org/static/favicon/wikipedia.ico" }
+      };
+      const savedPreset = localStorage.getItem('hwhub_tab_preset');
+      if (savedPreset && PRESETS[savedPreset]) {
+        document.title = PRESETS[savedPreset].title;
+        let link = document.querySelector("link[rel*='icon']");
+        if (!link) {
+          link = document.createElement("link");
+          link.rel = "icon";
+          document.head.appendChild(link);
+        }
+        link.href = PRESETS[savedPreset].icon;
+      }
+    })();
+
+    // Panic Key Handler
+    window.addEventListener('keydown', (e) => {
+      const panicKey = localStorage.getItem('hwhub_panic_key') || '\\';
+      const panicAction = localStorage.getItem('hwhub_panic_action') || 'decoy';
+
+      if (e.key === panicKey) {
+        e.preventDefault();
+        triggerPanic();
+      }
+    });
+
+    function triggerPanic() {
+      const panicAction = localStorage.getItem('hwhub_panic_action') || 'decoy';
+      if (panicAction === 'dnevnik') window.location.replace('https://dnevnik.ru');
+      else if (panicAction === 'wiki') window.location.replace('https://ru.wikipedia.org/wiki/Информатика');
+      else if (panicAction === 'ege') window.location.replace('https://inf-ege.sdamgia.ru/');
+      else window.location.href = '../../index.html';
+    }
+
+    function openAboutBlank() {
+      const win = window.open('about:blank', '_blank');
+      if (!win) {
+        alert('Всплывающее окно заблокировано браузером. Разрешите всплывающие окна.');
+        return;
+      }
+      const iframe = win.document.createElement('iframe');
+      iframe.style.position = 'fixed';
+      iframe.style.top = '0';
+      iframe.style.left = '0';
+      iframe.style.width = '100%';
+      iframe.style.height = '100%';
+      iframe.style.border = 'none';
+      iframe.style.outline = 'none';
+      iframe.src = window.location.href;
+      win.document.body.style.margin = '0';
+      win.document.body.style.height = '100vh';
+      win.document.body.style.overflow = 'hidden';
+      win.document.body.appendChild(iframe);
+      win.document.title = document.title;
+    }
+
+    function toggleFullscreen() {
+      const el = document.getElementById("screenArea");
+      if (!document.fullscreenElement) {
+        if (el.requestFullscreen) el.requestFullscreen();
+      } else {
+        if (document.exitFullscreen) document.exitFullscreen();
+      }
+    }
+  </script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      margin: 0; padding: 0; height: 100%;
+      background: #06090c; color: #e2e8f0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      overflow: hidden; user-select: none;
+      display: flex; flex-direction: column;
+    }
+
+    /* Top bar */
+    .topbar {
+      height: 44px;
+      background: #0e141a;
+      border-bottom: 1px solid #1a2732;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 14px;
+      z-index: 50;
+      flex-shrink: 0;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .back-btn {
+      background: #162029;
+      color: #cbd5e1;
+      border: 1px solid #283745;
+      padding: 4px 10px;
+      border-radius: 4px;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 500;
+      transition: background 0.15s;
+    }
+    .back-btn:hover { background: #223242; color: #fff; }
+
+    .game-badge {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      padding: 2px 6px;
+      border-radius: 3px;
+      text-transform: uppercase;
+      background: #166534;
+      color: #dcfce7;
+    }
+
+    .controls-hint {
+      font-size: 11px;
+      color: #94a3b8;
+      display: flex;
+      gap: 10px;
+    }
+    .controls-hint kbd {
+      background: #162029;
+      border: 1px solid #283745;
+      color: #4ade80;
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-family: inherit;
+      font-size: 10px;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tool-btn {
+      background: #162029;
+      border: 1px solid #283745;
+      color: #cbd5e0;
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s;
+    }
+    .tool-btn:hover { background: #223242; color: #fff; }
+
+    .panic-btn {
+      background: #7f1d1d;
+      border-color: #991b1b;
+      color: #fecaca;
+    }
+    .panic-btn:hover { background: #991b1b; color: #fff; }
+
+    /* Screen Area */
+    #screenArea {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #040608;
+      position: relative;
+      overflow: hidden;
+      padding: 8px;
+    }
+
+    canvas {
+      width: min(calc(100vw - 16px), calc((100vh - 60px) * 640 / 400));
+      height: min(calc(100vh - 60px), calc((100vw - 16px) * 400 / 640));
+      outline: none;
+      border: 1px solid #1a2732;
+      border-radius: 4px;
+      background: #000;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.9);
+      display: none;
+    }
+
+    #loadingOverlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #080d12;
+      color: #e2e8f0;
+      z-index: 10;
+      text-align: center;
+      padding: 20px;
+    }
+    #loadingTitle {
+      font-size: 26px;
+      font-weight: 800;
+      color: #4ade80;
+      letter-spacing: 0.1em;
+      margin-bottom: 8px;
+    }
+    #loadingSubtitle {
+      font-size: 13px;
+      color: #94a3b8;
+      max-width: 500px;
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+    .progress-bar-container {
+      width: 280px;
+      height: 8px;
+      background: #162029;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+    .progress-bar {
+      width: 0%;
+      height: 100%;
+      background: #22c55e;
+      transition: width 0.2s;
+    }
+    #loadingStatus {
+      font-family: monospace;
+      font-size: 12px;
+      color: #38bdf8;
+    }
+    #startBtn {
+      margin-top: 18px;
+      padding: 10px 28px;
+      background: #16a34a;
+      color: #fff;
+      border: 0;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      display: none;
+      transition: background 0.15s, transform 0.15s;
+    }
+    #startBtn:hover { background: #22c55e; transform: scale(1.02); }
+
+    .games-guide {
+      margin-top: 24px;
+      background: #0e141a;
+      border: 1px solid #1a2732;
+      border-radius: 6px;
+      padding: 12px 18px;
+      font-size: 11px;
+      color: #94a3b8;
+      max-width: 540px;
+      text-align: left;
+    }
+    .games-guide b { color: #f1f5f9; }
+    .games-guide ol { margin-left: 20px; margin-top: 6px; line-height: 1.6; }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="topbar-left">
+      <a href="../../index.html" class="back-btn">← Меню</a>
+      <span style="font-size: 13px; font-weight: 600; color: #4ade80;">Touhou PC-98 Anthology</span>
+      <span class="game-badge">TH01–TH05 EN</span>
+      <div class="controls-hint">
+        <span><kbd>Стрелки</kbd> / <kbd>Num 8 4 6 2</kbd> Движение</span>
+        <span><kbd>Z</kbd> / <kbd>Space</kbd> Огонь</span>
+        <span><kbd>X</kbd> Бомба</span>
+        <span><kbd>Esc</kbd> Пауза</span>
+        <span><kbd>F12</kbd> Меню игр</span>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <button class="tool-btn" onclick="openAboutBlank()" title="Открыть в чистой вкладке about:blank">🕶️ Скрытый режим</button>
+      <button class="tool-btn" onclick="toggleFullscreen()" title="Полный экран">⛶ Экран</button>
+      <button class="tool-btn panic-btn" onclick="triggerPanic()" title="Паника (\)">🚨 Паника (\)</button>
+    </div>
+  </div>
+
+  <div id="screenArea">
+    <canvas id="canvas" oncontextmenu="event.preventDefault()" tabindex="0"></canvas>
+
+    <div id="loadingOverlay">
+      <div id="loadingTitle">TOUHOU PC-98 ANTHOLOGY</div>
+      <div id="loadingSubtitle">
+        Полный сборник оригинальных игр Touhou эпохи NEC PC-98 (1996–1999) с английским переводом на эмуляторе Neko Project II (WebAssembly).
+      </div>
+      <div class="progress-bar-container">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+      <div id="loadingStatus">Инициализация эмулятора...</div>
+      <button id="startBtn" onclick="launchGame()">ЗАПУСТИТЬ АНТОЛОГИЮ</button>
+
+      <div class="games-guide">
+        <b>Содержимое антологии (выбор в стартовом меню диска):</b>
+        <ol>
+          <li><b>TH01</b>: Highly Responsive to Prayers (первая игра, арканоид)</li>
+          <li><b>TH02</b>: Story of Eastern Wonderland (первый вертикальный скролл-шмап)</li>
+          <li><b>TH03</b>: Phantasmagoria of Dim. Dream (дуэльный данмаку 1-на-1)</li>
+          <li><b>TH04</b>: Lotus Land Story (родина Bad Apple!, игра за Марису)</li>
+          <li><b>TH05</b>: Mystic Square (финал PC-98, появление Алисы Маргатройд)</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { NP21 } from "./np2-wasm.js";
+
+    const canvas = document.getElementById('canvas');
+    const progressBar = document.getElementById('progressBar');
+    const loadingStatus = document.getElementById('loadingStatus');
+    const startBtn = document.getElementById('startBtn');
+    const loadingOverlay = document.getElementById('loadingOverlay');
+
+    let np2Instance = null;
+    let hdiBuffer = null;
+
+    async function init() {
+      try {
+        loadingStatus.textContent = "Загрузка эмулятора PC-9821...";
+        progressBar.style.width = "20%";
+
+        np2Instance = await NP21.create({
+          canvas: canvas,
+          clk_mult: 8,
+          Latencys: 120,
+          onDiskChange: (name) => console.log('Disk changed:', name),
+          onExit: () => { if (np2Instance) np2Instance.reset(); }
+        });
+
+        loadingStatus.textContent = "Загрузка образа диска Touhou.hdi (~40 МБ)...";
+        progressBar.style.width = "40%";
+
+        const response = await fetch("touhou.hdi");
+        if (!response.ok) throw new Error("Ошибка HTTP: " + response.status);
+
+        const reader = response.body.getReader();
+        const contentLength = +response.headers.get('Content-Length') || 41568256;
+        let receivedLength = 0;
+        let chunks = [];
+
+        while(true) {
+          const {done, value} = await reader.read();
+          if (done) break;
+          chunks.push(value);
+          receivedLength += value.length;
+          const pct = Math.min(95, 40 + Math.floor((receivedLength / contentLength) * 55));
+          progressBar.style.width = pct + "%";
+          loadingStatus.textContent = `Загрузка диска: ${(receivedLength / (1024*1024)).toFixed(1)} / ${(contentLength / (1024*1024)).toFixed(1)} МБ...`;
+        }
+
+        hdiBuffer = new Uint8Array(receivedLength);
+        let position = 0;
+        for (let chunk of chunks) {
+          hdiBuffer.set(chunk, position);
+          position += chunk.length;
+        }
+
+        progressBar.style.width = "100%";
+        loadingStatus.textContent = "Диск загружен! Нажмите кнопку для старта.";
+        startBtn.style.display = "inline-block";
+      } catch (err) {
+        console.error(err);
+        loadingStatus.textContent = "Ошибка: " + err.message;
+        loadingStatus.style.color = "#f87171";
+      }
+    }
+
+    window.launchGame = function() {
+      if (!np2Instance || !hdiBuffer) return;
+      loadingOverlay.style.display = "none";
+      canvas.style.display = "block";
+      canvas.focus();
+
+      try {
+        np2Instance.addDiskImage("touhou.hdi", hdiBuffer);
+        np2Instance.setHdd(0, "touhou.hdi");
+        np2Instance.run();
+      } catch (err) {
+        console.error("Launch error:", err);
+        alert("Ошибка запуска PC-98: " + err.message);
+      }
+    };
+
+    init();
+  </script>
+</body>
+</html>

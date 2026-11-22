@@ -319,6 +319,16 @@ const DEFAULT_GAMES = [
     path: "games/touhou7/index.html",
     thumb: "games/touhou7/thumb.png",
     size: "77 MB"
+  },
+  {
+    id: "touhou-pc98",
+    title: "Touhou PC-98 Anthology",
+    category: "retro",
+    tags: ["Touhou Project", "PC-98", "Ретро", "TH01-TH05"],
+    desc: "Полная классическая антология первых пяти игр Touhou Project эпохи NEC PC-98 (1996–1999) с английским переводом на эмуляторе Neko Project II (WebAssembly). Включает TH01 (арканоидный данмаку), TH02 (дебют Марисы), TH03 (дуэли), TH04 (родина Bad Apple!) и TH05 (дебют Алисы).",
+    path: "games/touhou-pc98/index.html",
+    thumb: "games/touhou-pc98/thumb.png",
+    size: "43 MB"
   }
 ];
 
