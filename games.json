@@ -462,5 +462,21 @@
     "thumb": "games/doom/thumb.png",
     "size": "36 MB",
     "offline": true
+  },
+  {
+    "id": "touhou6",
+    "title": "Touhou 6: EoSD",
+    "category": "arcade",
+    "tags": [
+      "Данмаку",
+      "Touhou Project",
+      "Шутер",
+      "Боссы"
+    ],
+    "desc": "Легендарный скролл-шутер Touhou 6: The Embodiment of Scarlet Devil на HTML5/Canvas. Жрица Рейму Хакурей, 6 уровней с боссами (Румия, Чирно, Мэйлин, Пачули, Сакуя, Ремилия Скарлет), спелл-карты, бомбы и оригинальная музыка.",
+    "path": "games/touhou6/index.html",
+    "thumb": "games/touhou6/thumb.png",
+    "size": "9 MB",
+    "offline": true
   }
 ]
