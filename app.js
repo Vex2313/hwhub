@@ -249,6 +249,16 @@ const DEFAULT_GAMES = [
     path: "games/iwbtb/index.html",
     thumb: "games/iwbtb/thumb.png",
     size: "44 MB"
+  },
+  {
+    id: "tinystrike",
+    title: "Tiny Strike (CS с ботами)",
+    category: "arcade",
+    tags: ["3D Шутер", "CS 1.6", "Боты", "Оружие"],
+    desc: "Тактический 3D-шутер от первого лица в духе Counter-Strike: матчи 5х5 с ботами, закладка и разминирование бомбы, экономика и закупка оружия (AK-47, AWP, M4A1, Deagle), радар и 5 карт.",
+    path: "games/tinystrike/index.html",
+    thumb: "games/tinystrike/thumb.png",
+    size: "6 MB"
   }
 ];
 
