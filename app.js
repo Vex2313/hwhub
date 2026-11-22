@@ -309,6 +309,16 @@ const DEFAULT_GAMES = [
     path: "games/touhou6/index.html",
     thumb: "games/touhou6/thumb.png",
     size: "9 MB"
+  },
+  {
+    id: "touhou7",
+    title: "Touhou 7: PCB",
+    category: "arcade",
+    tags: ["Данмаку", "Touhou Project", "Шутер", "Боссы"],
+    desc: "Культовый скролл-шутер Touhou 7: Perfect Cherry Blossom (TypeScript-реимплементация). Уровни 1–8 (включая Extra и Phantasm), Рейму, Мариса и Сакуя (типы A/B), оригинальные ECL/ANM скрипты, система 森罗结界 (Supernatural Border), полная музыка и звуковые эффекты.",
+    path: "games/touhou7/index.html",
+    thumb: "games/touhou7/thumb.png",
+    size: "77 MB"
   }
 ];
 
