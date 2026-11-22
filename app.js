@@ -229,6 +229,26 @@ const DEFAULT_GAMES = [
     path: "games/cut-the-rope/index.html",
     thumb: "games/cut-the-rope/thumb.jpg",
     size: "28 MB"
+  },
+  {
+    id: "iwbtg",
+    title: "I Wanna Be The Guy",
+    category: "arcade",
+    tags: ["Хардкор", "Платформер", "Культ", "IWBTG"],
+    desc: "Легендарный ультра-хардкорный платформер. Управляйте Пареньком (The Kid), уворачивайтесь от падающих яблок, ловушек и станьте Мужиком.",
+    path: "games/iwbtg/index.html",
+    thumb: "games/iwbtg/thumb.png",
+    size: "1.5 MB"
+  },
+  {
+    id: "iwbtb",
+    title: "I Wanna Be The Bachelor",
+    category: "arcade",
+    tags: ["Хардкор", "Платформер", "Фан-игра", "30 уровней"],
+    desc: "Масштабная фан-игра в духе IWBTG: 30 изощрённых уровней, битвы с уникальными боссами и безумные ловушки на каждом шагу.",
+    path: "games/iwbtb/index.html",
+    thumb: "games/iwbtb/thumb.png",
+    size: "44 MB"
   }
 ];
 

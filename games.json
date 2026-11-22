@@ -3,7 +3,11 @@
     "id": "lltq",
     "title": "Long Live The Queen",
     "category": "story",
-    "tags": ["Visual Novel", "RPG", "Стратегия"],
+    "tags": [
+      "Visual Novel",
+      "RPG",
+      "Стратегия"
+    ],
     "desc": "Управляйте принцессой Элоди, балансируйте между интригами двора, учите науки и выживите до коронации.",
     "path": "games/lltq/index.html",
     "thumb": "games/lltq/web-presplash.jpg",
@@ -14,7 +18,10 @@
     "id": "2048",
     "title": "2048",
     "category": "puzzle",
-    "tags": ["Головоломка", "Логика"],
+    "tags": [
+      "Головоломка",
+      "Логика"
+    ],
     "desc": "Сдвигайте плитки с одинаковыми числами, объединяйте их и попробуйте собрать число 2048.",
     "path": "games/2048/index.html",
     "thumb": "games/2048/meta/apple-touch-icon.png",
@@ -25,7 +32,10 @@
     "id": "hextris",
     "title": "Hextris",
     "category": "arcade",
-    "tags": ["Аркада", "Реакция"],
+    "tags": [
+      "Аркада",
+      "Реакция"
+    ],
     "desc": "Шестиугольный Тетрис на реакцию. Вращайте платформу и собирайте блоки одного цвета по 3 в ряд.",
     "path": "games/hextris/index.html",
     "thumb": "games/hextris/images/icons/apple-touch-180.png",
@@ -36,7 +46,10 @@
     "id": "tetris",
     "title": "Tetris Classic",
     "category": "retro",
-    "tags": ["Ретро", "Классика"],
+    "tags": [
+      "Ретро",
+      "Классика"
+    ],
     "desc": "Классический Тетрис на HTML5 Canvas: чистая физика, таблица очков и максимальная производительность.",
     "path": "games/tetris/index.html",
     "thumb": "games/tetris/texture.jpg",
@@ -47,7 +60,10 @@
     "id": "snake",
     "title": "Retro Snake",
     "category": "retro",
-    "tags": ["Ретро", "Аркада"],
+    "tags": [
+      "Ретро",
+      "Аркада"
+    ],
     "desc": "Минималистичная змейка с сохранением рекордов. Ничего лишнего, запускается мгновенно.",
     "path": "games/snake/index.html",
     "thumb": "games/snake/thumb.svg",
@@ -58,7 +74,10 @@
     "id": "flappy",
     "title": "Floppy Bird",
     "category": "arcade",
-    "tags": ["Аркада", "Хардкор"],
+    "tags": [
+      "Аркада",
+      "Хардкор"
+    ],
     "desc": "Тот самый Flappy Bird без рекламы и с чистым откликом на клики и пробел.",
     "path": "games/flappy/index.html",
     "thumb": "games/flappy/assets/thumb.png",
@@ -69,7 +88,12 @@
     "id": "disgaea",
     "title": "Disgaea DS",
     "category": "story",
-    "tags": ["NDS", "RPG", "Тактика", "Шедевр"],
+    "tags": [
+      "NDS",
+      "RPG",
+      "Тактика",
+      "Шедевр"
+    ],
     "desc": "Легендарная тактическая RPG от Nippon Ichi Software на Nintendo DS. Юмор, демоны, бесконечная прокачка и поддержка сенсорного экрана.",
     "path": "games/disgaea/index.html",
     "thumb": "games/disgaea/thumb.png",
@@ -80,7 +104,11 @@
     "id": "subway",
     "title": "Subway Surfers",
     "category": "arcade",
-    "tags": ["3D", "Раннер", "Хит"],
+    "tags": [
+      "3D",
+      "Раннер",
+      "Хит"
+    ],
     "desc": "Официальная веб-версия культового раннера San Francisco. Прыгайте по поездам, собирайте монеты и ставьте рекорды.",
     "path": "games/subway/index.html",
     "thumb": "games/subway/thumb.png",
@@ -91,7 +119,11 @@
     "id": "drive-mad",
     "title": "Drive Mad",
     "category": "arcade",
-    "tags": ["3D", "Гонки", "Физика"],
+    "tags": [
+      "3D",
+      "Гонки",
+      "Физика"
+    ],
     "desc": "Популярнейшие физические гонки на выживание. Балансируйте на грузовиках, преодолевайте препятствия и пройдите 100 уровней.",
     "path": "games/drive-mad/index.html",
     "thumb": "games/drive-mad/webapp/cover.jpg",
@@ -102,7 +134,11 @@
     "id": "doodle-jump",
     "title": "Doodle Jump",
     "category": "arcade",
-    "tags": ["Аркада", "Классика", "Прыжки"],
+    "tags": [
+      "Аркада",
+      "Классика",
+      "Прыжки"
+    ],
     "desc": "Полная версия Дудл-джампа со всеми 10 темами оформления (Космос, Джунгли, Ниндзя) и звуками. Прыгайте выше всех!",
     "path": "games/doodle-jump/index.html",
     "thumb": "games/doodle-jump/img/icon.png",
@@ -113,7 +149,11 @@
     "id": "vex3",
     "title": "Vex 3",
     "category": "arcade",
-    "tags": ["Паркур", "Платформер", "Хардкор"],
+    "tags": [
+      "Паркур",
+      "Платформер",
+      "Хардкор"
+    ],
     "desc": "Культовый стикмен-платформер с лабиринтами, пилами, скольжением по стенам и чекпоинтами.",
     "path": "games/vex3/index.html",
     "thumb": "games/vex3/thumb.jpeg",
@@ -124,7 +164,11 @@
     "id": "pacman",
     "title": "Pac-Man Classic",
     "category": "retro",
-    "tags": ["Ретро", "Аркада", "Лабиринт"],
+    "tags": [
+      "Ретро",
+      "Аркада",
+      "Лабиринт"
+    ],
     "desc": "Аутентичный Пакман на Canvas с классическим ИИ призраков, фруктами, бонусами и оригинальным звуком.",
     "path": "games/pacman/index.html",
     "thumb": "games/pacman/thumb.svg",
@@ -135,7 +179,12 @@
     "id": "phoenix-wright",
     "title": "Phoenix Wright: Ace Attorney",
     "category": "story",
-    "tags": ["NDS", "Детектив", "Новелла", "Культ"],
+    "tags": [
+      "NDS",
+      "Детектив",
+      "Новелла",
+      "Культ"
+    ],
     "desc": "Культовая судебная новелла: расследуйте преступления, ищите улики, допрашивайте свидетелей и кричите «OBJECTION!», защищая невиновных.",
     "path": "games/phoenix-wright/index.html",
     "thumb": "games/phoenix-wright/thumb.jpg",
@@ -146,7 +195,12 @@
     "id": "fire-emblem",
     "title": "Fire Emblem: The Sacred Stones",
     "category": "story",
-    "tags": ["GBA", "Тактика", "RPG", "Шедевр"],
+    "tags": [
+      "GBA",
+      "Тактика",
+      "RPG",
+      "Шедевр"
+    ],
     "desc": "Вершина тактических RPG: королевские династии, предательства, магия, тактические битвы на сетке и перманентная смерть героев.",
     "path": "games/fire-emblem/index.html",
     "thumb": "games/fire-emblem/thumb.jpg",
@@ -157,7 +211,12 @@
     "id": "chrono-trigger",
     "title": "Chrono Trigger",
     "category": "story",
-    "tags": ["SNES", "JRPG", "Культ", "Шедевр"],
+    "tags": [
+      "SNES",
+      "JRPG",
+      "Культ",
+      "Шедевр"
+    ],
     "desc": "Признанный шедевр ролевых игр: путешествия во времени, арт от Акиры Ториямы, легендарная музыка и множество концовок.",
     "path": "games/chrono-trigger/index.html",
     "thumb": "games/chrono-trigger/thumb.jpg",
@@ -168,7 +227,12 @@
     "id": "castlevania",
     "title": "Castlevania: Aria of Sorrow",
     "category": "story",
-    "tags": ["GBA", "Action-RPG", "Метроидвания", "Культ"],
+    "tags": [
+      "GBA",
+      "Action-RPG",
+      "Метроидвания",
+      "Культ"
+    ],
     "desc": "Лучшая часть портативной Кастлвании: Сома Круз в замке Дракулы, поглощение душ монстров, готическая атмосфера и динамичные бои.",
     "path": "games/castlevania/index.html",
     "thumb": "games/castlevania/thumb.png",
@@ -179,7 +243,12 @@
     "id": "slope",
     "title": "Slope",
     "category": "arcade",
-    "tags": ["3D", "WebGL", "Бесконечная", "Хардкор"],
+    "tags": [
+      "3D",
+      "WebGL",
+      "Бесконечная",
+      "Хардкор"
+    ],
     "desc": "Культовый неоновый 3D-раннер: управляйте катящимся шаром по бесконечному процедурному склону на сумасшедшей скорости, уворачиваясь от препятствий.",
     "path": "games/slope/index.html",
     "thumb": "games/slope/thumb.jpeg",
@@ -190,7 +259,12 @@
     "id": "cookie-clicker",
     "title": "Cookie Clicker",
     "category": "arcade",
-    "tags": ["Кликер", "Бесконечная", "Залипалка", "Культ"],
+    "tags": [
+      "Кликер",
+      "Бесконечная",
+      "Залипалка",
+      "Культ"
+    ],
     "desc": "Самый залипательный кликер всех времён: выпекайте триллионы печений, нанимайте бабушек, стройте фермы и межпространственные фабрики.",
     "path": "games/cookie-clicker/index.html",
     "thumb": "games/cookie-clicker/thumb.png",
@@ -201,7 +275,12 @@
     "id": "stack",
     "title": "Stack 3D",
     "category": "arcade",
-    "tags": ["3D", "WebGL", "Физика", "Залипалка"],
+    "tags": [
+      "3D",
+      "WebGL",
+      "Физика",
+      "Залипалка"
+    ],
     "desc": "Медитативная бесконечная 3D-башня: вовремя ставьте скользящие блоки, срезайте лишнее и стройте башню до самых небес.",
     "path": "games/stack/index.html",
     "thumb": "games/stack/thumb.png",
@@ -212,7 +291,12 @@
     "id": "pokemon-emerald",
     "title": "Pokémon Emerald",
     "category": "story",
-    "tags": ["GBA", "RPG", "Покемоны", "Культ"],
+    "tags": [
+      "GBA",
+      "RPG",
+      "Покемоны",
+      "Культ"
+    ],
     "desc": "Легендарное приключение в регионе Хоэнн: ловите покемонов, побеждайте гим-лидеров, остановите команды Магма и Аква и покорите Боевой Рубеж.",
     "path": "games/pokemon-emerald/index.html",
     "thumb": "games/pokemon-emerald/thumb.png",
@@ -223,7 +307,12 @@
     "id": "super-mario-world",
     "title": "Super Mario World",
     "category": "arcade",
-    "tags": ["SNES", "Платформер", "Классика", "Культ"],
+    "tags": [
+      "SNES",
+      "Платформер",
+      "Классика",
+      "Культ"
+    ],
     "desc": "Шедевр платформеров на все времена: спасите Принцессу Пич, исследуйте Динозавриный остров верхом на Йоши и находите тайные выходы.",
     "path": "games/super-mario-world/index.html",
     "thumb": "games/super-mario-world/thumb.png",
@@ -234,7 +323,12 @@
     "id": "zelda-minish-cap",
     "title": "The Legend of Zelda: The Minish Cap",
     "category": "story",
-    "tags": ["GBA", "Приключение", "RPG", "Шедевр"],
+    "tags": [
+      "GBA",
+      "Приключение",
+      "RPG",
+      "Шедевр"
+    ],
     "desc": "Одна из лучших частей Зельды: волшебная говорящая шляпа Эзло, уменьшение до размера пикси, подземелья, головоломки и эпические битвы.",
     "path": "games/zelda-minish-cap/index.html",
     "thumb": "games/zelda-minish-cap/thumb.jpg",
@@ -245,11 +339,48 @@
     "id": "cut-the-rope",
     "title": "Cut the Rope",
     "category": "puzzle",
-    "tags": ["Головоломка", "Физика", "Хит", "Ам Ням"],
+    "tags": [
+      "Головоломка",
+      "Физика",
+      "Хит",
+      "Ам Ням"
+    ],
     "desc": "Официальная веб-версия легендарной физической головоломки: перерезайте веревки, лопайте пузыри, собирайте звезды и кормите сладостями Ам Няма.",
     "path": "games/cut-the-rope/index.html",
     "thumb": "games/cut-the-rope/thumb.jpg",
     "size": "28 MB",
+    "offline": true
+  },
+  {
+    "id": "iwbtg",
+    "title": "I Wanna Be The Guy",
+    "category": "arcade",
+    "tags": [
+      "Хардкор",
+      "Платформер",
+      "Культ",
+      "IWBTG"
+    ],
+    "desc": "Легендарный ультра-хардкорный платформер. Управляйте Пареньком (The Kid), уворачивайтесь от падающих яблок, ловушек и станьте Мужиком.",
+    "path": "games/iwbtg/index.html",
+    "thumb": "games/iwbtg/thumb.png",
+    "size": "1.5 MB",
+    "offline": true
+  },
+  {
+    "id": "iwbtb",
+    "title": "I Wanna Be The Bachelor",
+    "category": "arcade",
+    "tags": [
+      "Хардкор",
+      "Платформер",
+      "Фан-игра",
+      "30 уровней"
+    ],
+    "desc": "Масштабная фан-игра в духе IWBTG: 30 изощрённых уровней, битвы с уникальными боссами и безумные ловушки на каждом шагу.",
+    "path": "games/iwbtb/index.html",
+    "thumb": "games/iwbtb/thumb.png",
+    "size": "44 MB",
     "offline": true
   }
 ]

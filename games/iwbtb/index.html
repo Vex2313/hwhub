@@ -1,0 +1,569 @@
+<!DOCTYPE HTML>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>I Wanna Be The Bachelor — HW Hub</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="thumb.png">
+
+  <!-- Offline Local jQuery -->
+  <script src="lib/jquery.min.js"></script>
+
+  <!-- Quintus Engine Libraries -->
+  <script src="lib/quintus.js"></script>
+  <script src="lib/quintus_sprites.js"></script>
+  <script src="lib/quintus_scenes.js"></script>
+  <script src="lib/quintus_input.js"></script>
+  <script src="lib/quintus_anim.js"></script>
+  <script src="lib/quintus_2d.js"></script>
+  <script src="lib/quintus_touch.js"></script>
+  <script src="lib/quintus_ui.js"></script>
+  <script src="lib/quintus_tmx.js"></script>
+  <script src="lib/quintus_audio.js"></script>
+
+  <!-- Precompiled 30 Levels Data -->
+  <script src="scripts/levels_data.js"></script>
+
+  <!-- Game Scripts -->
+  <script src="scripts/iwbtb.js"></script>
+  <script src="scripts/animation.js"></script>
+  <script src="scripts/player.js"></script>
+  <script src="scripts/spike.js"></script>
+  <script src="scripts/fruit.js"></script>
+  <script src="scripts/bullet.js"></script>
+  <script src="scripts/warp.js"></script>
+  <script src="scripts/invisibleBlock.js"></script>
+  <script src="scripts/boss.js"></script>
+  <script src="scripts/gameover.js"></script>
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #090a0f;
+      color: #f1f5f9;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    /* Top bar */
+    .topbar {
+      height: 44px;
+      background: #11141e;
+      border-bottom: 1px solid #1f2536;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 14px;
+      z-index: 50;
+      flex-shrink: 0;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .back-btn {
+      background: #1b202e;
+      color: #cbd5e1;
+      border: 1px solid #2d374d;
+      padding: 4px 10px;
+      border-radius: 4px;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 500;
+      transition: background 0.15s;
+    }
+    .back-btn:hover { background: #262e45; color: #fff; }
+
+    .game-badge {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      padding: 2px 6px;
+      border-radius: 3px;
+      text-transform: uppercase;
+      background: #d97706;
+      color: #fef3c7;
+    }
+
+    .game-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #f8fafc;
+    }
+
+    .controls-hint {
+      font-size: 11px;
+      color: #64748b;
+      margin-left: 10px;
+    }
+    .controls-hint kbd {
+      background: #1e2433;
+      border: 1px solid #334155;
+      color: #94a3b8;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 10px;
+      font-family: monospace;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tool-btn {
+      background: #1a202c;
+      border: 1px solid #2d3748;
+      color: #cbd5e0;
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s;
+    }
+    .tool-btn:hover { background: #2d3748; color: #fff; }
+
+    .panic-btn {
+      background: #7f1d1d;
+      border-color: #991b1b;
+      color: #fecaca;
+    }
+    .panic-btn:hover { background: #991b1b; color: #fff; }
+
+    /* Game viewport */
+    .game-viewport {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #06070a;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .centeredCanvasDiv {
+      position: relative;
+      width: 800px;
+      height: 608px;
+      border-radius: 4px;
+      border: 2px solid #1e2538;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+      background: #000;
+      overflow: hidden;
+    }
+
+    .centeredCanvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+
+  <script>
+    // Tab Cloaking Sync
+    (function() {
+      const PRESETS = {
+        classroom: { title: "Google Класс", icon: "https://ssl.gstatic.com/classroom/favicon.png" },
+        dnevnik: { title: "Электронный дневник", icon: "https://dnevnik.ru/favicon.ico" },
+        resh: { title: "РЭШ — Российская электронная школа", icon: "https://resh.edu.ru/favicon.ico" },
+        wiki: { title: "Википедия — свободная энциклопедия", icon: "https://ru.wikipedia.org/static/favicon/wikipedia.ico" }
+      };
+      const savedPreset = localStorage.getItem('hwhub_tab_preset');
+      if (savedPreset && PRESETS[savedPreset]) {
+        document.title = PRESETS[savedPreset].title;
+        let link = document.querySelector("link[rel*='icon']");
+        if (!link) {
+          link = document.createElement("link");
+          link.rel = "icon";
+          document.head.appendChild(link);
+        }
+        link.href = PRESETS[savedPreset].icon;
+      }
+    })();
+
+    // Panic Key Handler
+    window.addEventListener('keydown', (e) => {
+      const panicKey = localStorage.getItem('hwhub_panic_key') || '\\';
+      const panicAction = localStorage.getItem('hwhub_panic_action') || 'decoy';
+
+      if (e.key === panicKey) {
+        e.preventDefault();
+        if (panicAction === 'dnevnik') window.location.replace('https://dnevnik.ru');
+        else if (panicAction === 'wiki') window.location.replace('https://ru.wikipedia.org/wiki/Информатика');
+        else if (panicAction === 'ege') window.location.replace('https://inf-ege.sdamgia.ru/');
+        else window.location.href = '../../index.html';
+      }
+    });
+
+    function triggerPanic() {
+      const panicAction = localStorage.getItem('hwhub_panic_action') || 'decoy';
+      if (panicAction === 'dnevnik') window.location.replace('https://dnevnik.ru');
+      else if (panicAction === 'wiki') window.location.replace('https://ru.wikipedia.org/wiki/Информатика');
+      else if (panicAction === 'ege') window.location.replace('https://inf-ege.sdamgia.ru/');
+      else window.location.href = '../../index.html';
+    }
+
+    function toggleFullscreen() {
+      const el = document.querySelector('.centeredCanvasDiv');
+      if (!document.fullscreenElement) {
+        el.requestFullscreen().catch(() => {});
+      } else {
+        document.exitFullscreen().catch(() => {});
+      }
+    }
+
+    function launchAboutBlank() {
+      const win = window.open('about:blank', '_blank');
+      if (!win) {
+        alert('Пожалуйста, разрешите всплывающие окна для запуска about:blank!');
+        return;
+      }
+      const doc = win.document;
+      doc.title = document.title;
+      doc.body.style.margin = '0';
+      doc.body.style.height = '100vh';
+      doc.body.style.overflow = 'hidden';
+      doc.body.style.background = '#000';
+      const iframe = doc.createElement('iframe');
+      iframe.style.border = 'none';
+      iframe.style.width = '100%';
+      iframe.style.height = '100%';
+      iframe.style.margin = '0';
+      iframe.src = window.location.href;
+      doc.body.appendChild(iframe);
+    }
+  </script>
+
+  <script>
+    // Lifecycle and Stats Management
+    $(document).ready(function () {
+      level = (function() {
+        try {
+          var l = localStorage.getItem('iwbtb_level');
+          if (l) return parseInt(l);
+        } catch(e) {}
+        return getCookie("level") ? parseInt(getCookie("level")) : 1;
+      })();
+
+      deaths = (function() {
+        try {
+          var d = localStorage.getItem('iwbtb_deaths');
+          if (d) return parseInt(d);
+        } catch(e) {}
+        return getCookie("deaths") ? parseInt(getCookie("deaths")) : 0;
+      })();
+
+      shots = (function() {
+        try {
+          var s = localStorage.getItem('iwbtb_shots');
+          if (s) return parseInt(s);
+        } catch(e) {}
+        return getCookie("shots") ? parseInt(getCookie("shots")) : 0;
+      })();
+
+      loadGame(level, deaths, shots, function () {
+        gameReady = true;
+      });
+    });
+
+    $(window).load(function () {
+      try {
+        var p = introMusic.play();
+        if (p && p.catch) p.catch(function() {});
+      } catch(e) {}
+      startMenuLoop();
+      menuState = "intro";
+    });
+  </script>
+</head>
+<body>
+
+  <!-- Top Bar -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <a href="../../index.html" class="back-btn">← Назад в хаб</a>
+      <span class="game-badge">FANGAME</span>
+      <span class="game-title">I Wanna Be The Bachelor (30 уровней)</span>
+      <span class="controls-hint">
+        <kbd>←</kbd><kbd>→</kbd> / <kbd>A</kbd><kbd>D</kbd> Бег •
+        <kbd>Shift</kbd> / <kbd>Space</kbd> Прыжок •
+        <kbd>Z</kbd> Стрельба •
+        <kbd>R</kbd> Рестарт •
+        <kbd>Q</kbd> Суицид
+      </span>
+    </div>
+    <div class="topbar-right">
+      <button class="tool-btn" onclick="launchAboutBlank()">👓 about:blank</button>
+      <button class="tool-btn" onclick="toggleFullscreen()">⛶ На весь экран</button>
+      <button class="tool-btn panic-btn" onclick="triggerPanic()">🚨 ПАНИКА</button>
+    </div>
+  </div>
+
+  <!-- Game Viewport -->
+  <div class="game-viewport">
+    <div class="centeredCanvasDiv">
+      <canvas class="centeredCanvas" id="menuCanvas" width="800" height="608"></canvas>
+      <canvas class="centeredCanvas" id="gameCanvas" width="800" height="608"></canvas>
+    </div>
+  </div>
+
+<script>
+    var CANVAS_WIDTH = 800;
+    var CANVAS_HEIGHT = 608;
+    var FPS = 60;
+    var MAINMENU_GAP = 45;
+    var gameLoop;
+    var canvas = document.getElementById("menuCanvas");
+    var context = canvas.getContext("2d");
+
+    // load menu images
+    var loadingImage = new Image();
+    var introImage = new Image();
+    var mainMenuImage = new Image();
+    var controlsImage = new Image();
+    var mainMenuKid = [];
+    var mainMenuArrow = [];
+    loadingImage.src = 'images/loading.png';
+    introImage.src = 'images/intro.png';
+    mainMenuImage.src = 'images/mainmenu.png';
+    controlsImage.src = 'images/controls.png';
+    for (var i = 0; i < 4; i++) {
+        mainMenuKid[i] = new Image();
+        mainMenuKid[i].src = 'images/mainMenuKid' + i + '.png';
+        mainMenuArrow[i] = new Image();
+        mainMenuArrow[i].src = 'images/mainMenuArrow' + i + '.png';
+    }
+
+    loadingImage.onload = function () {
+        context.drawImage(loadingImage, 240, 248);
+    };
+
+    // load menu music
+    var introMusic = new Audio('audio/intro.mp3');
+    introMusic.volume = 0.6;
+    var mainMenuMusic = new Audio('audio/mainmenu.mp3');
+    mainMenuMusic.volume = 0.8;
+    mainMenuMusic.loop = true;
+
+    var menuState = "loading";
+    var frameCount = 0;
+    context.font = "32pt Arial";
+    var text = ["In the Year 20XX", "On his 18th Birthday", "A child left home", "On his dangerous and epic quest", "To become The Bachelor!"];
+    var pointer = 0;
+    var alpha = 0;
+    var mainMenuSelector = 0;
+    var gameReady = false;
+
+    var level = 1;
+    var deaths = 0;
+    var shots = 0;
+
+    // Unlock WebAudio on first user interaction if blocked by browser policy
+    var audioUnlocked = false;
+    function tryUnlockAudio() {
+        if (!audioUnlocked) {
+            audioUnlocked = true;
+            if (menuState === "intro" && introMusic.paused) {
+                introMusic.play().catch(function() {});
+            } else if (menuState === "mainmenu" && mainMenuMusic.paused) {
+                mainMenuMusic.play().catch(function() {});
+            }
+        }
+    }
+
+    $("body").on("click", function() {
+        tryUnlockAudio();
+        if (menuState == "intro") {
+            introToMainMenu();
+        }
+    });
+
+    $("body").keydown(function (event) {
+        tryUnlockAudio();
+        var keyPressed = event.which;
+        if (menuState == "intro") {
+            introToMainMenu();
+        } else if (menuState == "mainmenu") {
+            // 13 = Enter, 32 = Space, 16 = Shift, 90 = Z
+            if (keyPressed == 13 || keyPressed == 32 || keyPressed == 16 || keyPressed == 90) {
+                if (mainMenuSelector == 0) {
+                    mainMenuMusic.pause();
+                    menuState = "playing";
+                    if (gameReady) {
+                        menuStartGame();
+                    }
+                } else if (mainMenuSelector == 1) {
+                    menuState = "controls";
+                } else if (mainMenuSelector == 2) {
+                    resetData();
+                }
+            }
+            // 38 Arrow Key "up", 87 "W"
+            else if (keyPressed == 38 || keyPressed == 87) {
+                if (mainMenuSelector > 0) {
+                    mainMenuSelector--;
+                }
+            } 
+            // 40 Arrow Key "down", 83 "S"
+            else if (keyPressed == 40 || keyPressed == 83) {
+                if (mainMenuSelector < 1) {
+                    mainMenuSelector++;
+                }
+            }
+        } else if (menuState == "controls") {
+            // 27 = Escape, 13 = Enter, 32 = Space, 16 = Shift, 90 = Z
+            if (keyPressed == 27 || keyPressed == 13 || keyPressed == 32 || keyPressed == 16 || keyPressed == 90) {
+                menuState = "mainmenu";
+            }
+        }
+    });
+
+    function getCookie(cname) {
+        var name = cname + "=";
+        var ca = document.cookie.split(';');
+        for (var i = 0; i < ca.length; i++) {
+            var c = ca[i];
+            while (c.charAt(0) == ' ') c = c.substring(1);
+            if (c.indexOf(name) == 0) return c.substring(name.length, c.length);
+        }
+        return "";
+    }
+
+    function startMenuLoop() {
+        gameLoop = setInterval(function () {
+            update();
+            render();
+        }, 1000 / FPS);
+    }
+
+    function update() {
+        if (menuState == "intro") {
+            if (frameCount % 231 < 100) {
+                introFade(true);
+            } else if (frameCount % 231 >= 130 && frameCount % 231 < 230) {
+                introFade(false);
+            } else if (frameCount % 231 == 230) {
+                pointer++;
+                if (pointer >= text.length) {
+                    introToMainMenu();
+                }
+            }
+        } else if (menuState == "playing") {
+            if (gameReady) {
+                menuStartGame();
+            }
+        }
+        frameCount++;
+    }
+
+    function introFade(plus) {
+        plus ? alpha += 0.01 : alpha -= 0.01;
+    }
+
+    function introToMainMenu() {
+        context.fillStyle = "rgba(255, 255, 255, 1)";
+        try { introMusic.pause(); } catch(e) {}
+        try { mainMenuMusic.play().catch(function() {}); } catch(e) {}
+        menuState = "mainmenu";
+    }
+
+    function menuStartGame() {
+        context.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+        window.clearInterval(gameLoop);
+        startGame();
+    }
+
+    function saveUserStats(lvl, dths, shts) {
+        try {
+            localStorage.setItem('iwbtb_level', lvl);
+            localStorage.setItem('iwbtb_deaths', dths);
+            localStorage.setItem('iwbtb_shots', shts);
+        } catch(e) {}
+        document.cookie = "level=" + lvl + ";expires=Thu, 01 Jan 2065 12:00:00 UTC;";
+        document.cookie = "deaths=" + dths + ";expires=Thu, 01 Jan 2065 12:00:00 UTC;";
+        document.cookie = "shots=" + shts + ";expires=Thu, 01 Jan 2065 12:00:00 UTC;";
+    }
+
+    function playingToMainMenu(lvl, dths, shts) {
+        this.level = lvl;
+        this.deaths = dths;
+        this.shots = shts;
+        menuState = "mainmenu";
+        startMenuLoop();
+        mainMenuMusic.currentTime = 0;
+        try { mainMenuMusic.play().catch(function() {}); } catch(e) {}
+        saveUserStats(lvl, dths, shts);
+    }
+
+    function resetData() {
+        saveUserStats(1, 0, 0);
+        level = 1;
+        deaths = 0;
+        shots = 0;
+    }
+
+    function render() {
+        context.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+        if (menuState == "intro") {
+            context.drawImage(introImage, 0, 0);
+            context.fillStyle = "rgba(255, 255, 255, " + Math.max(0, Math.min(1, alpha)) + ")";
+            context.fillText(text[pointer], 410 - (text[pointer].length * 10.5), 520);
+        } else if (menuState == "mainmenu") {
+            context.drawImage(mainMenuImage, 0, 0);
+            context.font = "24pt Arial";
+            context.fillStyle = "#ffffff";
+            context.fillText("Start Game", 280, 395);
+            context.fillText("Controls", 280, 395 + MAINMENU_GAP);
+            
+            context.font = "16pt Arial";
+            if (level >= 30) {
+                context.fillText("Game Cleared !!", 20, 520);
+            } else {
+                context.fillText("Current Level: " + level.toString(), 20, 520);
+            }
+            context.fillText("Deaths: " + deaths.toString(), 20, 550);
+            context.fillText("Shots Fired: " + shots.toString(), 20, 580);
+            
+            var modulo24 = frameCount % 24;
+            var modulo18 = frameCount % 18;
+            if (modulo24 < 6) {
+                context.drawImage(mainMenuKid[0], 656, 401);
+            } else if (modulo24 < 12) {
+                context.drawImage(mainMenuKid[1], 656, 401);
+            } else if (modulo24 < 18) {
+                context.drawImage(mainMenuKid[2], 656, 401);
+            } else {
+                context.drawImage(mainMenuKid[3], 656, 401);
+            }
+            
+            if (modulo18 < 3) {
+                context.drawImage(mainMenuArrow[0], 240, 374 + (mainMenuSelector * MAINMENU_GAP));
+            } else if (modulo18 < 6 || modulo18 >= 15) {
+                context.drawImage(mainMenuArrow[1], 240, 374 + (mainMenuSelector * MAINMENU_GAP));
+            } else if (modulo18 < 9 || (modulo18 >= 12 && modulo18 < 15 )) {
+                context.drawImage(mainMenuArrow[2], 240, 374 + (mainMenuSelector * MAINMENU_GAP));
+            } else {
+                context.drawImage(mainMenuArrow[3], 240, 374 + (mainMenuSelector * MAINMENU_GAP));
+            }
+        } else if (menuState == "controls") {
+            context.drawImage(controlsImage, 0, 0);
+        } else if (menuState == "playing") {
+            context.drawImage(loadingImage, 240, 248);
+        }
+    }
+</script>
+</body>
+</html>

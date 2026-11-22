@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <title>I Wanna Be The Guy — HW Hub</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="thumb.png">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #090a0f;
+      color: #f1f5f9;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    /* Top bar */
+    .topbar {
+      height: 44px;
+      background: #11141e;
+      border-bottom: 1px solid #1f2536;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 14px;
+      z-index: 50;
+      flex-shrink: 0;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .back-btn {
+      background: #1b202e;
+      color: #cbd5e1;
+      border: 1px solid #2d374d;
+      padding: 4px 10px;
+      border-radius: 4px;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 500;
+      transition: background 0.15s;
+    }
+    .back-btn:hover { background: #262e45; color: #fff; }
+
+    .game-badge {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      padding: 2px 6px;
+      border-radius: 3px;
+      text-transform: uppercase;
+      background: #be123c;
+      color: #ffe4e6;
+    }
+
+    .game-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #f8fafc;
+    }
+
+    .controls-hint {
+      font-size: 11px;
+      color: #64748b;
+      margin-left: 10px;
+    }
+    .controls-hint kbd {
+      background: #1e2433;
+      border: 1px solid #334155;
+      color: #94a3b8;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 10px;
+      font-family: monospace;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tool-btn {
+      background: #1a202c;
+      border: 1px solid #2d3748;
+      color: #cbd5e0;
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s;
+    }
+    .tool-btn:hover { background: #2d3748; color: #fff; }
+
+    .panic-btn {
+      background: #7f1d1d;
+      border-color: #991b1b;
+      color: #fecaca;
+    }
+    .panic-btn:hover { background: #991b1b; color: #fff; }
+
+    /* Game area */
+    .game-viewport {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #06070a;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #canvas {
+      border: 2px solid #1e2538;
+      border-radius: 4px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+      background: #000;
+      max-width: calc(100vw - 20px);
+      max-height: calc(100vh - 64px);
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+    }
+
+    /* Modal / Settings Overlay */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(4px);
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.active { display: flex; }
+
+    .modal-box {
+      background: #11141e;
+      border: 1px solid #2d374d;
+      border-radius: 8px;
+      padding: 20px;
+      width: 440px;
+      max-width: 90vw;
+      color: #e2e8f0;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.7);
+    }
+    .modal-box h3 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: #f8fafc;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modal-close {
+      cursor: pointer;
+      color: #94a3b8;
+      font-size: 18px;
+    }
+    .modal-close:hover { color: #fff; }
+
+    .link_like {
+      display: inline-block;
+      cursor: pointer;
+      font-size: 12px;
+      color: #38bdf8;
+      padding: 4px 8px;
+      background: #1e2538;
+      border-radius: 4px;
+      border: 1px solid #2b354d;
+      margin-bottom: 6px;
+      transition: all 0.15s;
+    }
+    .link_like:hover {
+      background: #2b354d;
+      color: #7dd3fc;
+    }
+
+    #keys table {
+      width: 100%;
+      margin: 10px 0;
+    }
+    #keys td {
+      padding: 4px;
+    }
+    #press_key_msg {
+      background: #991b1b;
+      color: #fef2f2;
+      padding: 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      text-align: center;
+      margin: 10px 0;
+    }
+
+    #debug, #warn {
+      font-size: 10px;
+      color: #64748b;
+      font-family: monospace;
+      margin-top: 8px;
+      max-height: 40px;
+      overflow: auto;
+    }
+  </style>
+
+  <script>
+    // Tab Cloaking Sync
+    (function() {
+      const PRESETS = {
+        classroom: { title: "Google Класс", icon: "https://ssl.gstatic.com/classroom/favicon.png" },
+        dnevnik: { title: "Электронный дневник", icon: "https://dnevnik.ru/favicon.ico" },
+        resh: { title: "РЭШ — Российская электронная школа", icon: "https://resh.edu.ru/favicon.ico" },
+        wiki: { title: "Википедия — свободная энциклопедия", icon: "https://ru.wikipedia.org/static/favicon/wikipedia.ico" }
+      };
+      const savedPreset = localStorage.getItem('hwhub_tab_preset');
+      if (savedPreset && PRESETS[savedPreset]) {
+        document.title = PRESETS[savedPreset].title;
+        let link = document.querySelector("link[rel*='icon']");
+        if (!link) {
+          link = document.createElement("link");
+          link.rel = "icon";
+          document.head.appendChild(link);
+        }
+        link.href = PRESETS[savedPreset].icon;
+      }
+    })();
+
+    // Panic Key Handler
+    window.addEventListener('keydown', (e) => {
+      const panicKey = localStorage.getItem('hwhub_panic_key') || '\\';
+      const panicAction = localStorage.getItem('hwhub_panic_action') || 'decoy';
+
+      if (e.key === panicKey) {
+        e.preventDefault();
+        if (panicAction === 'dnevnik') window.location.replace('https://dnevnik.ru');
+        else if (panicAction === 'wiki') window.location.replace('https://ru.wikipedia.org/wiki/Информатика');
+        else if (panicAction === 'ege') window.location.replace('https://inf-ege.sdamgia.ru/');
+        else window.location.href = '../../index.html';
+      }
+    });
+
+    function triggerPanic() {
+      const panicAction = localStorage.getItem('hwhub_panic_action') || 'decoy';
+      if (panicAction === 'dnevnik') window.location.replace('https://dnevnik.ru');
+      else if (panicAction === 'wiki') window.location.replace('https://ru.wikipedia.org/wiki/Информатика');
+      else if (panicAction === 'ege') window.location.replace('https://inf-ege.sdamgia.ru/');
+      else window.location.href = '../../index.html';
+    }
+
+    function toggleFullscreen() {
+      const c = document.getElementById('canvas');
+      if (!document.fullscreenElement) {
+        c.requestFullscreen().catch(() => {});
+      } else {
+        document.exitFullscreen().catch(() => {});
+      }
+    }
+
+    function launchAboutBlank() {
+      const win = window.open('about:blank', '_blank');
+      if (!win) {
+        alert('Пожалуйста, разрешите всплывающие окна для запуска about:blank!');
+        return;
+      }
+      const doc = win.document;
+      doc.title = document.title;
+      doc.body.style.margin = '0';
+      doc.body.style.height = '100vh';
+      doc.body.style.overflow = 'hidden';
+      doc.body.style.background = '#000';
+      const iframe = doc.createElement('iframe');
+      iframe.style.border = 'none';
+      iframe.style.width = '100%';
+      iframe.style.height = '100%';
+      iframe.style.margin = '0';
+      iframe.src = window.location.href;
+      doc.body.appendChild(iframe);
+    }
+
+    function toggleSettings() {
+      const m = document.getElementById('settingsModal');
+      m.classList.toggle('active');
+    }
+  </script>
+</head>
+<body>
+
+  <!-- Top Bar -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <a href="../../index.html" class="back-btn">← Назад в хаб</a>
+      <span class="game-badge">IWBTG</span>
+      <span class="game-title">I Wanna Be The Guy</span>
+      <span class="controls-hint">
+        <kbd>←</kbd><kbd>→</kbd> / <kbd>A</kbd><kbd>D</kbd> Бег •
+        <kbd>Shift</kbd> / <kbd>Space</kbd> Прыжок •
+        <kbd>Z</kbd> / <kbd>T</kbd> Выстрел •
+        <kbd>R</kbd> Рестарт •
+        <kbd>Q</kbd> Суицид
+      </span>
+    </div>
+    <div class="topbar-right">
+      <button class="tool-btn" onclick="toggleSettings()">⚙️ Клавиши</button>
+      <button class="tool-btn" onclick="launchAboutBlank()">👓 about:blank</button>
+      <button class="tool-btn" onclick="toggleFullscreen()">⛶ На весь экран</button>
+      <button class="tool-btn panic-btn" onclick="triggerPanic()">🚨 ПАНИКА</button>
+    </div>
+  </div>
+
+  <!-- Game Viewport -->
+  <div class="game-viewport">
+    <canvas id="canvas" width="800" height="600">
+      <p>Ваш браузер не поддерживает Canvas.</p>
+    </canvas>
+  </div>
+
+  <!-- Settings Modal (Required elements for iwbtc engine) -->
+  <div id="settingsModal" class="modal-overlay">
+    <div class="modal-box">
+      <h3>Настройки управления <span class="modal-close" onclick="toggleSettings()">&times;</span></h3>
+
+      <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+        <span class="link_like" id="reset_save">Сбросить сохранение на уровень 1</span>
+        <span class="link_like" id="mute_button">Звук: вкл/выкл (M)</span>
+      </div>
+
+      <div id="keys">
+        <table>
+          <tr>
+            <td><span class="link_like" id="change_left">Влево: ←</span></td>
+            <td><span class="link_like" id="change_jump">Прыжок: Space / Shift</span></td>
+            <td><span class="link_like" id="change_restart">Рестарт: R</span></td>
+          </tr>
+          <tr>
+            <td><span class="link_like" id="change_right">Вправо: →</span></td>
+            <td><span class="link_like" id="change_shoot">Стрельба: Z / T</span></td>
+            <td><span class="link_like" id="change_mute">Мут: M</span></td>
+          </tr>
+        </table>
+      </div>
+
+      <div style="display: none" id="press_key_msg">
+        Нажмите любую клавишу для назначения (Esc для отмены).
+      </div>
+
+      <span class="link_like" id="reset_keys">Сбросить раскладку по умолчанию</span>
+
+      <pre id="debug"></pre>
+      <pre id="warn"></pre>
+    </div>
+  </div>
+
+  <!-- Engine Script -->
+  <script src="iwbtc-all.js"></script>
+
+</body>
+</html>
