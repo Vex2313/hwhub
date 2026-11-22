@@ -1,0 +1,511 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="Культовый скролл-шутер Touhou 8: Imperishable Night (東方永夜抄) в браузере (C++ порт движка на WebAssembly). Поддерживает оригинальные DAT-файлы, сохранение рекордов и спелл-карт." />
+  <title>Touhou 8: Imperishable Night — HW Hub</title>
+  <link rel="icon" type="image/png" href="thumb.png">
+  <script src="coi-serviceworker.js"></script>
+  <script>
+    // Tab Cloaking Sync
+    (function() {
+      const PRESETS = {
+        classroom: { title: "Google Класс", icon: "https://ssl.gstatic.com/classroom/favicon.png" },
+        dnevnik: { title: "Электронный дневник", icon: "https://dnevnik.ru/favicon.ico" },
+        resh: { title: "РЭШ — Российская электронная школа", icon: "https://resh.edu.ru/favicon.ico" },
+        wiki: { title: "Википедия — свободная энциклопедия", icon: "https://ru.wikipedia.org/static/favicon/wikipedia.ico" }
+      };
+      const savedPreset = localStorage.getItem('hwhub_tab_preset');
+      if (savedPreset && PRESETS[savedPreset]) {
+        document.title = PRESETS[savedPreset].title;
+        let link = document.querySelector("link[rel*='icon']");
+        if (!link) {
+          link = document.createElement("link");
+          link.rel = "icon";
+          document.head.appendChild(link);
+        }
+        link.href = PRESETS[savedPreset].icon;
+      }
+    })();
+
+    // Panic Key Handler
+    window.addEventListener('keydown', (e) => {
+      const panicKey = localStorage.getItem('hwhub_panic_key') || '\\';
+      const panicAction = localStorage.getItem('hwhub_panic_action') || 'decoy';
+
+      if (e.key === panicKey) {
+        e.preventDefault();
+        triggerPanic();
+      }
+    });
+
+    function triggerPanic() {
+      const panicAction = localStorage.getItem('hwhub_panic_action') || 'decoy';
+      if (panicAction === 'dnevnik') window.location.replace('https://dnevnik.ru');
+      else if (panicAction === 'wiki') window.location.replace('https://ru.wikipedia.org/wiki/Информатика');
+      else if (panicAction === 'ege') window.location.replace('https://inf-ege.sdamgia.ru/');
+      else window.location.href = '../../index.html';
+    }
+
+    function openAboutBlank() {
+      const win = window.open('about:blank', '_blank');
+      if (!win) {
+        alert('Всплывающее окно заблокировано браузером. Разрешите всплывающие окна.');
+        return;
+      }
+      const iframe = win.document.createElement('iframe');
+      iframe.style.position = 'fixed';
+      iframe.style.top = '0';
+      iframe.style.left = '0';
+      iframe.style.width = '100%';
+      iframe.style.height = '100%';
+      iframe.style.border = 'none';
+      iframe.style.outline = 'none';
+      iframe.src = window.location.href;
+      win.document.body.style.margin = '0';
+      win.document.body.style.height = '100vh';
+      win.document.body.style.overflow = 'hidden';
+      win.document.body.appendChild(iframe);
+      win.document.title = document.title;
+    }
+
+    function toggleFullscreen() {
+      const el = document.getElementById("gameSection");
+      if (!document.fullscreenElement) {
+        if (el.requestFullscreen) el.requestFullscreen();
+      } else {
+        if (document.exitFullscreen) document.exitFullscreen();
+      }
+    }
+  </script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      margin: 0; padding: 0; height: 100%;
+      background: #080910; color: #f5f1ff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      overflow: hidden; user-select: none;
+      display: flex; flex-direction: column;
+    }
+
+    /* Top bar */
+    .topbar {
+      height: 44px;
+      background: #0e101d;
+      border-bottom: 1px solid #1e2138;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 14px;
+      z-index: 50;
+      flex-shrink: 0;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .back-btn {
+      background: #17192b;
+      color: #cbd5e1;
+      border: 1px solid #2d3254;
+      padding: 4px 10px;
+      border-radius: 4px;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 500;
+      transition: background 0.15s;
+    }
+    .back-btn:hover { background: #232742; color: #fff; }
+
+    .game-badge {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      padding: 2px 6px;
+      border-radius: 3px;
+      text-transform: uppercase;
+      background: #4f46e5;
+      color: #e0e7ff;
+    }
+
+    .controls-hint {
+      font-size: 11px;
+      color: #94a3b8;
+      display: flex;
+      gap: 10px;
+    }
+    .controls-hint kbd {
+      background: #17192b;
+      border: 1px solid #2d3254;
+      color: #818cf8;
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-family: inherit;
+      font-size: 10px;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tool-btn {
+      background: #17192b;
+      border: 1px solid #2d3254;
+      color: #cbd5e0;
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s;
+    }
+    .tool-btn:hover { background: #232742; color: #fff; }
+
+    .panic-btn {
+      background: #7f1d1d;
+      border-color: #991b1b;
+      color: #fecaca;
+    }
+    .panic-btn:hover { background: #991b1b; color: #fff; }
+
+    /* Main Container */
+    #mainLayout {
+      flex: 1;
+      display: grid;
+      grid-template-columns: minmax(18rem, 24rem) 1fr;
+      gap: 1.5rem;
+      padding: 1.2rem;
+      overflow: hidden;
+      max-width: 1280px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    @media (max-width: 900px) {
+      #mainLayout {
+        grid-template-columns: 1fr;
+        overflow-y: auto;
+      }
+    }
+
+    .sidebar-panel {
+      padding: 1.2rem;
+      border: 1px solid #262942;
+      border-radius: 0.75rem;
+      background: #101220;
+      box-shadow: 0 1rem 3rem rgba(0,0,0,0.5);
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      overflow-y: auto;
+    }
+
+    .panel-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #c7d2fe;
+    }
+    .panel-subtitle {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: #818cf8;
+      text-transform: uppercase;
+    }
+
+    .panel-desc {
+      font-size: 0.82rem;
+      color: #94a3b8;
+      line-height: 1.5;
+    }
+
+    .file-label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #e0e7ff;
+      margin-top: 4px;
+    }
+    .file-input {
+      display: block;
+      width: 100%;
+      margin-top: 4px;
+      font-size: 0.78rem;
+      color: #cbd5e1;
+      background: #17192b;
+      border: 1px solid #2d3254;
+      border-radius: 4px;
+      padding: 6px;
+    }
+
+    .start-btn {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 0;
+      border-radius: 0.5rem;
+      background: #6366f1;
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.15s;
+      margin-top: 8px;
+    }
+    .start-btn:hover:not([disabled]) { background: #4f46e5; transform: scale(1.02); }
+    .start-btn[disabled] { cursor: not-allowed; opacity: 0.45; }
+
+    #status {
+      min-height: 2.2rem;
+      padding: 0.6rem 0.8rem;
+      border-radius: 0.4rem;
+      background: #0a0b12;
+      color: #ddd5f5;
+      font-size: 0.78rem;
+      font-family: monospace;
+      line-height: 1.4;
+    }
+
+    #log {
+      max-height: 9rem;
+      overflow-y: auto;
+      padding: 0.6rem 0.8rem;
+      border-radius: 0.4rem;
+      background: #06070a;
+      color: #94a3b8;
+      font-size: 0.72rem;
+      font-family: monospace;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    /* Game Viewport */
+    #gameSection {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #000;
+      border: 1px solid #262942;
+      border-radius: 0.75rem;
+      overflow: hidden;
+      position: relative;
+    }
+
+    canvas {
+      width: min(100%, calc((100vh - 80px) * 640 / 480));
+      height: min(calc(100vh - 80px), calc(100% * 480 / 640));
+      background: #000;
+      outline: none;
+      image-rendering: pixelated;
+    }
+    #display-canvas { visibility: hidden; }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="topbar-left">
+      <a href="../../index.html" class="back-btn">← Меню</a>
+      <span style="font-size: 13px; font-weight: 600; color: #818cf8;">Touhou 8: Imperishable Night</span>
+      <span class="game-badge">WASM SOURCE PORT</span>
+      <div class="controls-hint">
+        <span><kbd>Стрелки</kbd> Движение</span>
+        <span><kbd>Z</kbd> Огонь / Выбор</span>
+        <span><kbd>X</kbd> Бомба / Отмена</span>
+        <span><kbd>Shift</kbd> Фокус (Человек / Ёкай)</span>
+        <span><kbd>Esc</kbd> Пауза</span>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <button class="tool-btn" onclick="openAboutBlank()" title="Открыть в чистой вкладке about:blank">🕶️ Скрытый режим</button>
+      <button class="tool-btn" onclick="toggleFullscreen()" title="Полный экран">⛶ Экран</button>
+      <button class="tool-btn panic-btn" onclick="triggerPanic()" title="Паника (\)">🚨 Паника (\)</button>
+    </div>
+  </div>
+
+  <div id="mainLayout">
+    <div class="sidebar-panel">
+      <div>
+        <div class="panel-subtitle">WebAssembly Port</div>
+        <div class="panel-title">Imperishable Night</div>
+      </div>
+      <p class="panel-desc">
+        Оригинальный C++ движок Touhou 8: Imperishable Night, скомпилированный под WebAssembly. Выберите файлы <code>th08.dat</code> и <code>thbgm.dat</code> из вашей копии игры.
+      </p>
+
+      <label class="file-label">
+        Файл игры (th08.dat):
+        <input class="file-input" type="file" id="game-data" accept=".dat,application/octet-stream">
+      </label>
+
+      <label class="file-label">
+        Музыкальный архив (thbgm.dat):
+        <input class="file-input" type="file" id="bgm-data" accept=".dat,application/octet-stream">
+      </label>
+
+      <button id="start" class="start-btn" disabled>ЗАПУСТИТЬ TOUHOU 8</button>
+
+      <div id="status" role="status">Загрузка WebAssembly движка…</div>
+      <pre id="log" aria-label="Лог движка"></pre>
+    </div>
+
+    <div id="gameSection">
+      <canvas id="canvas" width="640" height="480" oncontextmenu="event.preventDefault()" tabindex="0"></canvas>
+      <canvas id="display-canvas" width="640" height="480" oncontextmenu="event.preventDefault()" aria-hidden="true"></canvas>
+    </div>
+  </div>
+
+  <script>
+    const gameInput = document.querySelector("#game-data");
+    const bgmInput = document.querySelector("#bgm-data");
+    const startButton = document.querySelector("#start");
+    const statusElement = document.querySelector("#status");
+    const logElement = document.querySelector("#log");
+    const canvas = document.querySelector("#canvas");
+    const displayCanvas = document.querySelector("#display-canvas");
+    const gameSection = document.querySelector("#gameSection");
+    const useBitmapPresentation = navigator.userAgent.includes("Firefox/");
+
+    let runtimeReady = false;
+    let started = false;
+    let gameFileSystemReady = false;
+
+    const persistentFiles = ["th08.cfg", "score.dat", "score.txt"];
+    const persistentDirectories = ["replay", "backup", "snapshot"];
+    const retailArchiveNames = new Set(["th08.dat", "thbgm.dat"]);
+
+    function appendLog(e) {
+      logElement.textContent += `${e}\n`;
+      logElement.scrollTop = logElement.scrollHeight;
+    }
+
+    function selectedFiles() {
+      return [gameInput.files[0], bgmInput.files[0]];
+    }
+
+    function selectionIsValid() {
+      const [e, t] = selectedFiles();
+      return e?.name.toLowerCase().endsWith(".dat") && t?.name.toLowerCase().endsWith(".dat");
+    }
+
+    function updateStartState() {
+      startButton.disabled = started || !runtimeReady || !selectionIsValid();
+      if (!selectionIsValid() && runtimeReady) {
+        statusElement.textContent = "Выберите файлы th08.dat и thbgm.dat для запуска.";
+      } else if (!started && runtimeReady) {
+        const [e, t] = selectedFiles();
+        statusElement.textContent = `Готово: ${e.name} (${(e.size / (1024*1024)).toFixed(1)} МБ), ${t.name} (${(t.size / (1024*1024)).toFixed(1)} МБ).`;
+      }
+    }
+
+    function ensureDirectory(e) {
+      try { Module.FS.mkdir(e); }
+      catch (t) {
+        const a = Module.FS.stat(e).mode;
+        if (!Module.FS.isDir(a)) throw t;
+      }
+    }
+
+    function syncFileSystem(e) {
+      return new Promise((t, a) => {
+        Module.FS.syncfs(e, (e => e ? a(e) : t()));
+      });
+    }
+
+    async function prepareGameFileSystem() {
+      if (gameFileSystemReady) return;
+      ensureDirectory("/game");
+      ensureDirectory("/save");
+      for (const e of persistentDirectories) ensureDirectory(`/game/${e}`);
+      let e = false;
+      const t = ["/save", ...persistentDirectories.map(e => `/game/${e}`)];
+      try {
+        for (const e of t) Module.FS.mount(Module.IDBFS, { autoPersist: true }, e);
+        await syncFileSystem(true);
+        e = true;
+      } catch (err) {
+        console.error("Browser save persistence unavailable", err);
+      }
+      for (const e of persistentFiles) {
+        try { Module.FS.symlink(`/save/${e}`, `/game/${e}`); } catch(x){}
+      }
+      gameFileSystemReady = true;
+    }
+
+    gameInput.addEventListener("change", updateStartState);
+    bgmInput.addEventListener("change", updateStartState);
+
+    const gameKeyCodes = new Map([
+      ["ArrowUp", 38], ["ArrowDown", 40], ["ArrowLeft", 37], ["ArrowRight", 39],
+      ["Numpad1", 97], ["Numpad2", 98], ["Numpad3", 99], ["Numpad4", 100],
+      ["Numpad6", 102], ["Numpad7", 103], ["Numpad8", 104], ["Numpad9", 105],
+      ["Home", 36], ["KeyP", 80], ["KeyD", 68], ["KeyZ", 90], ["KeyX", 88],
+      ["ShiftLeft", 16], ["ShiftRight", 16], ["Escape", 27],
+      ["ControlLeft", 17], ["ControlRight", 17], ["KeyQ", 81], ["KeyS", 83],
+      ["KeyR", 82], ["Enter", 13], ["NumpadEnter", 13]
+    ]);
+
+    function updateGameKey(e, t) {
+      const a = gameKeyCodes.get(e.code);
+      if (started && a !== undefined) {
+        e.preventDefault();
+        Module._th08_web_set_key_state(a, t ? 1 : 0);
+      }
+    }
+
+    window.addEventListener("keydown", (e => updateGameKey(e, true)));
+    window.addEventListener("keyup", (e => updateGameKey(e, false)));
+    window.addEventListener("blur", () => {
+      if (runtimeReady && Module._th08_web_clear_key_state) Module._th08_web_clear_key_state();
+    });
+
+    var Module = {
+      noInitialRun: true,
+      canvas: canvas,
+      print: appendLog,
+      printErr: appendLog,
+      setStatus: e => { if (e) statusElement.textContent = e; },
+      onAbort: e => { statusElement.textContent = `Сбой игры: ${e}`; },
+      onRuntimeInitialized: () => {
+        runtimeReady = true;
+        updateStartState();
+      }
+    };
+
+    startButton.addEventListener("click", async () => {
+      if (!selectionIsValid() || started) return;
+      const [e, t] = selectedFiles();
+      started = true;
+      updateStartState();
+      try {
+        statusElement.textContent = "Подготовка памяти и локального хранилища…";
+        const [a] = await Promise.all([e.arrayBuffer(), prepareGameFileSystem()]);
+        const n = new Uint8Array(a);
+        const s = Module._th08_web_allocate_game_data(n.byteLength);
+        if (!s) throw new Error("Не удалось выделить память для th08.dat.");
+        Module.HEAPU8.set(n, s);
+        Module.th08RetailFiles = [e, t];
+        Module._th08_web_set_retail_file_sizes(e.size, t.size);
+        Module.FS.chdir("/game");
+        Module.FS.writeFile("th08.dat", new Uint8Array(0));
+        Module.FS.writeFile("thbgm.dat", new Uint8Array(0));
+        canvas.focus();
+        statusElement.textContent = "Touhou 8 успешно запущена!";
+        Module.callMain([]);
+      } catch (err) {
+        console.error(err);
+        statusElement.textContent = `Ошибка запуска: ${err.message}`;
+        started = false;
+        updateStartState();
+      }
+    });
+  </script>
+  <script async src="th08-web.js"></script>
+</body>
+</html>

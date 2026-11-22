@@ -510,5 +510,21 @@
     "thumb": "games/touhou-pc98/thumb.png",
     "size": "43 MB",
     "offline": true
+  },
+  {
+    "id": "touhou8",
+    "title": "Touhou 8: Imperishable Night",
+    "category": "arcade",
+    "tags": [
+      "Данмаку",
+      "Touhou Project",
+      "Шутер",
+      "WASM"
+    ],
+    "desc": "Культовый скролл-шутер Touhou 8: Imperishable Night на движке WebAssembly (порт C++ исходников). Поддержка команд Человек/Ёкай (Рейму + Юкари, Мариса + Алиса, Сакуя + Ремилия, Ёму + Ююко), режим Last Spell, сохранение рекордов и спелл-карт.",
+    "path": "games/touhou8/index.html",
+    "thumb": "games/touhou8/thumb.png",
+    "size": "2 MB",
+    "offline": true
   }
 ]
