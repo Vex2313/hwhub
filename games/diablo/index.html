@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8"/>
+  <link rel="shortcut icon" href="thumb.png"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta name="theme-color" content="#000000"/>
+  <meta name="description" content="Культовая экшен-RPG Diablo 1 в браузере (C++ декомпиляция DevilutionX на WebAssembly). Содержит shareware-версию spawn.mpq и поддерживает загрузку полного retail DIABDAT.MPQ."/>
+  <title>Diablo (DevilutionX WASM) — HW Hub</title>
+  <link href="./static/css/main.e1dd4272.chunk.css" rel="stylesheet">
+  <script>
+    // Tab Cloaking Sync
+    (function() {
+      const PRESETS = {
+        classroom: { title: "Google Класс", icon: "https://ssl.gstatic.com/classroom/favicon.png" },
+        dnevnik: { title: "Электронный дневник", icon: "https://dnevnik.ru/favicon.ico" },
+        resh: { title: "РЭШ — Российская электронная школа", icon: "https://resh.edu.ru/favicon.ico" },
+        wiki: { title: "Википедия — свободная энциклопедия", icon: "https://ru.wikipedia.org/static/favicon/wikipedia.ico" }
+      };
+      const savedPreset = localStorage.getItem('hwhub_tab_preset');
+      if (savedPreset && PRESETS[savedPreset]) {
+        document.title = PRESETS[savedPreset].title;
+        let link = document.querySelector("link[rel*='icon']");
+        if (!link) {
+          link = document.createElement("link");
+          link.rel = "icon";
+          document.head.appendChild(link);
+        }
+        link.href = PRESETS[savedPreset].icon;
+      }
+    })();
+
+    // Panic Key Handler
+    window.addEventListener('keydown', (e) => {
+      const panicKey = localStorage.getItem('hwhub_panic_key') || '\\';
+      const panicAction = localStorage.getItem('hwhub_panic_action') || 'decoy';
+
+      if (e.key === panicKey) {
+        e.preventDefault();
+        triggerPanic();
+      }
+    });
+
+    function triggerPanic() {
+      const panicAction = localStorage.getItem('hwhub_panic_action') || 'decoy';
+      if (panicAction === 'dnevnik') window.location.replace('https://dnevnik.ru');
+      else if (panicAction === 'wiki') window.location.replace('https://ru.wikipedia.org/wiki/Информатика');
+      else if (panicAction === 'ege') window.location.replace('https://inf-ege.sdamgia.ru/');
+      else window.location.href = '../../index.html';
+    }
+
+    function openAboutBlank() {
+      const win = window.open('about:blank', '_blank');
+      if (!win) {
+        alert('Всплывающее окно заблокировано браузером. Разрешите всплывающие окна.');
+        return;
+      }
+      const iframe = win.document.createElement('iframe');
+      iframe.style.position = 'fixed';
+      iframe.style.top = '0';
+      iframe.style.left = '0';
+      iframe.style.width = '100%';
+      iframe.style.height = '100%';
+      iframe.style.border = 'none';
+      iframe.style.outline = 'none';
+      iframe.src = window.location.href;
+      win.document.body.style.margin = '0';
+      win.document.body.style.height = '100vh';
+      win.document.body.style.overflow = 'hidden';
+      win.document.body.appendChild(iframe);
+      win.document.title = document.title;
+    }
+
+    function toggleFullscreen() {
+      const el = document.documentElement;
+      if (!document.fullscreenElement) {
+        if (el.requestFullscreen) el.requestFullscreen();
+      } else {
+        if (document.exitFullscreen) document.exitFullscreen();
+      }
+    }
+  </script>
+  <style>
+    /* HW Hub Topbar styling override */
+    .topbar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 40px;
+      background: #0d0e14;
+      border-bottom: 1px solid #221a15;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 14px;
+      z-index: 9999;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      user-select: none;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .back-btn {
+      background: #191414;
+      color: #cbd5e1;
+      border: 1px solid #382727;
+      padding: 4px 10px;
+      border-radius: 4px;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 500;
+      transition: background 0.15s;
+    }
+    .back-btn:hover { background: #301f1f; color: #fff; }
+
+    .game-badge {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      padding: 2px 6px;
+      border-radius: 3px;
+      text-transform: uppercase;
+      background: #991b1b;
+      color: #fee2e2;
+    }
+
+    .controls-hint {
+      font-size: 11px;
+      color: #a8a29e;
+      display: flex;
+      gap: 10px;
+    }
+    .controls-hint kbd {
+      background: #1c1917;
+      border: 1px solid #44403c;
+      color: #f87171;
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-family: inherit;
+      font-size: 10px;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tool-btn {
+      background: #1c1917;
+      border: 1px solid #44403c;
+      color: #e7e5e4;
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s;
+    }
+    .tool-btn:hover { background: #292524; color: #fff; }
+
+    .panic-btn {
+      background: #7f1d1d;
+      border-color: #991b1b;
+      color: #fecaca;
+    }
+    .panic-btn:hover { background: #991b1b; color: #fff; }
+
+    /* Adjust Diablo app container to respect topbar */
+    #root {
+      top: 40px !important;
+      bottom: 0 !important;
+      position: absolute !important;
+      left: 0 !important;
+      right: 0 !important;
+      background: #000;
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="topbar-left">
+      <a href="../../index.html" class="back-btn">← Меню</a>
+      <span style="font-size: 13px; font-weight: 600; color: #fca5a5;">Diablo (DevilutionX)</span>
+      <span class="game-badge">WASM DECOMP</span>
+      <div class="controls-hint">
+        <span><kbd>ЛКМ</kbd> Ходьба / Атака</span>
+        <span><kbd>ПКМ</kbd> Заклинание</span>
+        <span><kbd>Shift</kbd> Атака на месте</span>
+        <span><kbd>I</kbd> Инвентарь</span>
+        <span><kbd>C</kbd> Персонаж</span>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <button class="tool-btn" onclick="openAboutBlank()" title="Открыть в чистой вкладке about:blank">🕶️ Скрытый режим</button>
+      <button class="tool-btn" onclick="toggleFullscreen()" title="Полный экран">⛶ Экран</button>
+      <button class="tool-btn panic-btn" onclick="triggerPanic()" title="Паника (\)">🚨 Паника (\)</button>
+    </div>
+  </div>
+
+  <noscript>Для запуска Diablo требуется включенный JavaScript.</noscript>
+  <div id="root"></div>
+
+  <script>
+    !function(f){
+      function e(e){
+        for(var r,t,n=e[0],o=e[1],u=e[2],i=0,l=[];i<n.length;i++)t=n[i],p[t]&&l.push(p[t][0]),p[t]=0;
+        for(r in o)Object.prototype.hasOwnProperty.call(o,r)&&(f[r]=o[r]);
+        for(s&&s(e);l.length;)l.shift()();
+        return c.push.apply(c,u||[]),a()
+      }
+      function a(){
+        for(var e,r=0;r<c.length;r++){
+          for(var t=c[r],n=!0,o=1;o<t.length;o++){
+            var u=t[o];0!==p[u]&&(n=!1)
+          }
+          n&&(c.splice(r--,1),e=i(i.s=t[0]))
+        }
+        return e
+      }
+      var t={},p={2:0},c=[];
+      function i(e){
+        if(t[e])return t[e].exports;
+        var r=t[e]={i:e,l:!1,exports:{}};
+        return f[e].call(r.exports,r,r.exports,i),r.l=!0,r.exports
+      }
+      i.m=f,i.c=t,i.d=function(e,r,t){i.o(e,r)||Object.defineProperty(e,r,{enumerable:!0,get:t})},
+      i.r=function(e){"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(e,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(e,"__esModule",{value:!0})},
+      i.t=function(r,e){
+        if(1&e&&(r=i(r)),8&e)return r;
+        if(4&e&&"object"==typeof r&&r&&r.__esModule)return r;
+        var t=Object.create(null);
+        if(i.r(t),Object.defineProperty(t,"default",{enumerable:!0,value:r}),2&e&&"string"!=typeof r)for(var n in r)i.d(t,n,function(e){return r[e]}.bind(null,n));
+        return t
+      },
+      i.n=function(e){var r=e&&e.__esModule?function(){return e.default}:function(){return e};return i.d(r,"a",r),r},
+      i.o=function(e,r){return Object.prototype.hasOwnProperty.call(e,r)},
+      i.p="./";
+      var r=window.webpackJsonp=window.webpackJsonp||[],n=r.push.bind(r);
+      r.push=e,r=r.slice();
+      for(var o=0;o<r.length;o++)e(r[o]);
+      var s=n;a()
+    }([]);
+  </script>
+  <script src="./static/js/0.aaa06a1e.chunk.js"></script>
+  <script src="./static/js/5.430d8c5c.chunk.js"></script>
+  <script src="./static/js/main.0a18bc0c.chunk.js"></script>
+</body>
+</html>

@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <title>3D Pinball: Space Cadet — HW Hub</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Культовый 3D Pinball Space Cadet для Windows в браузере (C++ декомпиляция на WebAssembly)">
+  <link rel="icon" type="image/png" href="thumb.png">
+  <script>
+    // Tab Cloaking Sync
+    (function() {
+      const PRESETS = {
+        classroom: { title: "Google Класс", icon: "https://ssl.gstatic.com/classroom/favicon.png" },
+        dnevnik: { title: "Электронный дневник", icon: "https://dnevnik.ru/favicon.ico" },
+        resh: { title: "РЭШ — Российская электронная школа", icon: "https://resh.edu.ru/favicon.ico" },
+        wiki: { title: "Википедия — свободная энциклопедия", icon: "https://ru.wikipedia.org/static/favicon/wikipedia.ico" }
+      };
+      const savedPreset = localStorage.getItem('hwhub_tab_preset');
+      if (savedPreset && PRESETS[savedPreset]) {
+        document.title = PRESETS[savedPreset].title;
+        let link = document.querySelector("link[rel*='icon']");
+        if (!link) {
+          link = document.createElement("link");
+          link.rel = "icon";
+          document.head.appendChild(link);
+        }
+        link.href = PRESETS[savedPreset].icon;
+      }
+    })();
+
+    // Panic Key Handler
+    window.addEventListener('keydown', (e) => {
+      const panicKey = localStorage.getItem('hwhub_panic_key') || '\\';
+      const panicAction = localStorage.getItem('hwhub_panic_action') || 'decoy';
+
+      if (e.key === panicKey) {
+        e.preventDefault();
+        triggerPanic();
+      }
+    });
+
+    function triggerPanic() {
+      const panicAction = localStorage.getItem('hwhub_panic_action') || 'decoy';
+      if (panicAction === 'dnevnik') window.location.replace('https://dnevnik.ru');
+      else if (panicAction === 'wiki') window.location.replace('https://ru.wikipedia.org/wiki/Информатика');
+      else if (panicAction === 'ege') window.location.replace('https://inf-ege.sdamgia.ru/');
+      else window.location.href = '../../index.html';
+    }
+
+    function openAboutBlank() {
+      const win = window.open('about:blank', '_blank');
+      if (!win) {
+        alert('Всплывающее окно заблокировано браузером. Разрешите всплывающие окна.');
+        return;
+      }
+      const iframe = win.document.createElement('iframe');
+      iframe.style.position = 'fixed';
+      iframe.style.top = '0';
+      iframe.style.left = '0';
+      iframe.style.width = '100%';
+      iframe.style.height = '100%';
+      iframe.style.border = 'none';
+      iframe.style.outline = 'none';
+      iframe.src = window.location.href;
+      win.document.body.style.margin = '0';
+      win.document.body.style.height = '100vh';
+      win.document.body.style.overflow = 'hidden';
+      win.document.body.appendChild(iframe);
+      win.document.title = document.title;
+    }
+  </script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #090a0f;
+      color: #f1f5f9;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    /* Top bar */
+    .topbar {
+      height: 44px;
+      background: #11141e;
+      border-bottom: 1px solid #1f2536;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 14px;
+      z-index: 50;
+      flex-shrink: 0;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .back-btn {
+      background: #1b202e;
+      color: #cbd5e1;
+      border: 1px solid #2d374d;
+      padding: 4px 10px;
+      border-radius: 4px;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 500;
+      transition: background 0.15s;
+    }
+    .back-btn:hover { background: #262e45; color: #fff; }
+
+    .game-badge {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      padding: 2px 6px;
+      border-radius: 3px;
+      text-transform: uppercase;
+      background: #2563eb;
+      color: #dbeafe;
+    }
+
+    .controls-hint {
+      font-size: 11px;
+      color: #94a3b8;
+      display: flex;
+      gap: 10px;
+    }
+    .controls-hint kbd {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #38bdf8;
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-family: inherit;
+      font-size: 10px;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tool-btn {
+      background: #1a202c;
+      border: 1px solid #2d3748;
+      color: #cbd5e0;
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s;
+    }
+    .tool-btn:hover { background: #2d3748; color: #fff; }
+
+    .panic-btn {
+      background: #7f1d1d;
+      border-color: #991b1b;
+      color: #fecaca;
+    }
+    .panic-btn:hover { background: #991b1b; color: #fff; }
+
+    /* Game Viewport */
+    .viewport {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #05070c;
+      position: relative;
+      overflow: hidden;
+      padding: 10px;
+    }
+
+    /* Windows 95/XP Window Style */
+    :root {
+      --ActiveBorder: rgb(212, 208, 200);
+      --ActiveTitle: rgb(10, 36, 106);
+      --Background: rgb(58, 110, 165);
+      --ButtonDkShadow: rgb(64, 64, 64);
+      --ButtonFace: rgb(212, 208, 200);
+      --ButtonHilight: rgb(255, 255, 255);
+      --ButtonLight: rgb(212, 208, 200);
+      --ButtonShadow: rgb(128, 128, 128);
+      --ButtonText: rgb(0, 0, 0);
+      --GradientActiveTitle: rgb(166, 202, 240);
+      --TitleText: rgb(255, 255, 255);
+      --WindowFrame: rgb(0, 0, 0);
+      --WindowText: rgb(0, 0, 0);
+    }
+
+    .window {
+      font-size: 9pt;
+      color: var(--WindowText);
+      background-color: var(--ButtonFace);
+      border: 1px solid var(--ActiveBorder);
+      box-shadow: -0.5px -0.5px 0 0.5px var(--ButtonHilight), 0 0 0 1px var(--ButtonShadow), -0.5px -0.5px 0 1.5px var(--ButtonLight), 0 0 0 2px var(--ButtonDkShadow);
+      display: inline-flex;
+      flex-direction: column;
+      border-radius: 2px;
+      max-height: calc(100vh - 60px);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+    }
+
+    .titlebar {
+      text-align: start;
+      margin: 0;
+      padding: 2px 3px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      user-select: none;
+      background-color: var(--ActiveTitle);
+      background-image: linear-gradient(to right, var(--ActiveTitle), var(--GradientActiveTitle));
+      color: var(--TitleText);
+      align-items: center;
+      justify-content: space-between;
+      height: 22px;
+    }
+
+    .titlebar-title {
+      display: flex;
+      padding: 0 4px;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      flex-grow: 1;
+      font-weight: 700;
+      align-items: center;
+      font-size: 11px;
+    }
+
+    .titlebar-controls {
+      display: flex;
+      gap: 2px;
+    }
+
+    .win-btn {
+      width: 14px;
+      height: 12px;
+      background: var(--ButtonFace);
+      color: #000;
+      border: 1px solid var(--ButtonHilight);
+      border-right-color: var(--ButtonDkShadow);
+      border-bottom-color: var(--ButtonDkShadow);
+      font-size: 9px;
+      line-height: 10px;
+      text-align: center;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .content-area {
+      background: #000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    #canvas {
+      border: 0 none;
+      background-color: #000;
+      max-width: 100%;
+      height: auto;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+    }
+
+    #status {
+      color: #38bdf8;
+      font-size: 13px;
+      font-family: monospace;
+      padding: 30px;
+      text-align: center;
+    }
+
+    progress {
+      width: 220px;
+      height: 14px;
+      accent-color: #0284c7;
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="topbar-left">
+      <a href="../../index.html" class="back-btn">← Меню</a>
+      <span style="font-size: 13px; font-weight: 600;">3D Pinball: Space Cadet</span>
+      <span class="game-badge">WASM DECOMP</span>
+      <div class="controls-hint">
+        <span><kbd>Space</kbd> Пуск</span>
+        <span><kbd>Z</kbd> Левый флиппер</span>
+        <span><kbd>/</kbd> Правый флиппер</span>
+        <span><kbd>F2</kbd> Новая игра</span>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <button class="tool-btn" onclick="openAboutBlank()" title="Открыть в чистой вкладке about:blank">🕶️ Скрытый режим</button>
+      <button class="tool-btn" onclick="toggleFullscreen()" title="Полный экран">⛶ Экран</button>
+      <button class="tool-btn panic-btn" onclick="triggerPanic()" title="Паника (\)">🚨 Паника (\)</button>
+    </div>
+  </div>
+
+  <div class="viewport" id="viewport">
+    <div class="window" id="windowContainer">
+      <div class="titlebar">
+        <span class="titlebar-title">3D Pinball for Windows - Space Cadet</span>
+        <div class="titlebar-controls">
+          <div class="win-btn" onclick="toggleFullscreen()">🗖</div>
+          <div class="win-btn" onclick="triggerPanic()">✕</div>
+        </div>
+      </div>
+      <div class="content-area">
+        <div id="status">Загрузка C++ WASM движка Space Cadet...</div>
+        <div><progress hidden id="progress" max="100" value="0"></progress></div>
+        <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" style="display:none" tabindex="-1"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    var statusElement = document.getElementById("status");
+    var progressElement = document.getElementById("progress");
+    var canvasElement = document.getElementById("canvas");
+
+    var Module = {
+      preRun: [],
+      postRun: [],
+      print: function(text) {
+        if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(" ");
+        console.log(text);
+      },
+      printErr: function(text) {
+        if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(" ");
+        console.error(text);
+      },
+      canvas: (function() {
+        canvasElement.addEventListener("webglcontextlost", function(e) {
+          alert("WebGL context lost. Перезагрузите страницу.");
+          e.preventDefault();
+        }, false);
+        return canvasElement;
+      })(),
+      setStatus: function(text) {
+        if (!Module.setStatus.last) Module.setStatus.last = { time: Date.now(), text: "" };
+        if (text === Module.setStatus.last.text) return;
+        var m = text.match(/([^(]+)\((\d+(\.\d+)?)\/(\d+)\)/);
+        var now = Date.now();
+        if (m && now - Module.setStatus.last.time < 30) return;
+        Module.setStatus.last.time = now;
+        Module.setStatus.last.text = text;
+        if (m) {
+          text = m[1];
+          progressElement.value = 100 * parseInt(m[2]);
+          progressElement.max = 100 * parseInt(m[4]);
+          progressElement.hidden = false;
+        } else {
+          progressElement.value = null;
+          progressElement.max = null;
+          progressElement.hidden = true;
+          canvasElement.style.display = "";
+        }
+        statusElement.innerHTML = text;
+        if (text === "") {
+          statusElement.style.display = "none";
+          progressElement.style.display = "none";
+          canvasElement.focus();
+        } else {
+          statusElement.style.display = "";
+        }
+      },
+      totalDependencies: 0,
+      monitorRunDependencies: function(left) {
+        this.totalDependencies = Math.max(this.totalDependencies, left);
+        Module.setStatus(left ? "Подготовка ресурсов (" + (this.totalDependencies - left) + "/" + this.totalDependencies + ")..." : "");
+      }
+    };
+
+    Module.setStatus("Загрузка игровых данных Pinball...");
+
+    window.onerror = function(event) {
+      Module.setStatus("Ошибка запуска движка: " + event);
+    };
+
+    function toggleFullscreen() {
+      const el = document.getElementById("viewport");
+      if (!document.fullscreenElement) {
+        if (el.requestFullscreen) el.requestFullscreen();
+      } else {
+        if (document.exitFullscreen) document.exitFullscreen();
+      }
+    }
+  </script>
+  <script async src="SpaceCadetPinball.js"></script>
+</body>
+</html>

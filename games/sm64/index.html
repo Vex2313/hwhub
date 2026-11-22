@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="description" content="Легендарный 3D платформер Super Mario 64 в браузере (C декомпиляция sm64-port на WebAssembly/WebGL)" />
+  <title>Super Mario 64 (WASM Port) — HW Hub</title>
+  <link rel="icon" type="image/png" href="thumb.png">
+  <script>
+    // Tab Cloaking Sync
+    (function() {
+      const PRESETS = {
+        classroom: { title: "Google Класс", icon: "https://ssl.gstatic.com/classroom/favicon.png" },
+        dnevnik: { title: "Электронный дневник", icon: "https://dnevnik.ru/favicon.ico" },
+        resh: { title: "РЭШ — Российская электронная школа", icon: "https://resh.edu.ru/favicon.ico" },
+        wiki: { title: "Википедия — свободная энциклопедия", icon: "https://ru.wikipedia.org/static/favicon/wikipedia.ico" }
+      };
+      const savedPreset = localStorage.getItem('hwhub_tab_preset');
+      if (savedPreset && PRESETS[savedPreset]) {
+        document.title = PRESETS[savedPreset].title;
+        let link = document.querySelector("link[rel*='icon']");
+        if (!link) {
+          link = document.createElement("link");
+          link.rel = "icon";
+          document.head.appendChild(link);
+        }
+        link.href = PRESETS[savedPreset].icon;
+      }
+    })();
+
+    // Panic Key Handler
+    window.addEventListener('keydown', (e) => {
+      const panicKey = localStorage.getItem('hwhub_panic_key') || '\\';
+      const panicAction = localStorage.getItem('hwhub_panic_action') || 'decoy';
+
+      if (e.key === panicKey) {
+        e.preventDefault();
+        triggerPanic();
+      }
+    });
+
+    function triggerPanic() {
+      const panicAction = localStorage.getItem('hwhub_panic_action') || 'decoy';
+      if (panicAction === 'dnevnik') window.location.replace('https://dnevnik.ru');
+      else if (panicAction === 'wiki') window.location.replace('https://ru.wikipedia.org/wiki/Информатика');
+      else if (panicAction === 'ege') window.location.replace('https://inf-ege.sdamgia.ru/');
+      else window.location.href = '../../index.html';
+    }
+
+    function openAboutBlank() {
+      const win = window.open('about:blank', '_blank');
+      if (!win) {
+        alert('Всплывающее окно заблокировано браузером. Разрешите всплывающие окна.');
+        return;
+      }
+      const iframe = win.document.createElement('iframe');
+      iframe.style.position = 'fixed';
+      iframe.style.top = '0';
+      iframe.style.left = '0';
+      iframe.style.width = '100%';
+      iframe.style.height = '100%';
+      iframe.style.border = 'none';
+      iframe.style.outline = 'none';
+      iframe.src = window.location.href;
+      win.document.body.style.margin = '0';
+      win.document.body.style.height = '100vh';
+      win.document.body.style.overflow = 'hidden';
+      win.document.body.appendChild(iframe);
+      win.document.title = document.title;
+    }
+
+    function toggleFullscreen() {
+      const el = document.getElementById("gameContainer");
+      if (!document.fullscreenElement) {
+        if (el.requestFullscreen) el.requestFullscreen();
+      } else {
+        if (document.exitFullscreen) document.exitFullscreen();
+      }
+    }
+
+    function toggleControls() {
+      const modal = document.getElementById('controlsModal');
+      modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
+    }
+  </script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body, html {
+      background-color: #000000;
+      color: #f1f5f9;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    /* Top bar */
+    .topbar {
+      height: 44px;
+      background: #11141e;
+      border-bottom: 1px solid #1f2536;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 14px;
+      z-index: 50;
+      flex-shrink: 0;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .back-btn {
+      background: #1b202e;
+      color: #cbd5e1;
+      border: 1px solid #2d374d;
+      padding: 4px 10px;
+      border-radius: 4px;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 500;
+      transition: background 0.15s;
+    }
+    .back-btn:hover { background: #262e45; color: #fff; }
+
+    .game-badge {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      padding: 2px 6px;
+      border-radius: 3px;
+      text-transform: uppercase;
+      background: #dc2626;
+      color: #fef2f2;
+    }
+
+    .controls-hint {
+      font-size: 11px;
+      color: #94a3b8;
+      display: flex;
+      gap: 10px;
+    }
+    .controls-hint kbd {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #f87171;
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-family: inherit;
+      font-size: 10px;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tool-btn {
+      background: #1a202c;
+      border: 1px solid #2d3748;
+      color: #cbd5e0;
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s;
+    }
+    .tool-btn:hover { background: #2d3748; color: #fff; }
+
+    .panic-btn {
+      background: #7f1d1d;
+      border-color: #991b1b;
+      color: #fecaca;
+    }
+    .panic-btn:hover { background: #991b1b; color: #fff; }
+
+    /* Game Viewport */
+    #gameContainer {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #000;
+      position: relative;
+      overflow: hidden;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      outline: none;
+      display: block;
+      image-rendering: pixelated;
+    }
+
+    /* Modal / Controls */
+    .modal-overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(4px);
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-box {
+      background: #131722;
+      border: 1px solid #28324a;
+      border-radius: 8px;
+      padding: 24px;
+      width: 440px;
+      max-width: 90vw;
+      color: #e2e8f0;
+      font-size: 13px;
+    }
+    .modal-box h3 { margin-bottom: 12px; color: #f87171; font-size: 16px; }
+    .table-controls { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    .table-controls td { padding: 6px 8px; border-bottom: 1px solid #1f2738; }
+    .table-controls kbd {
+      background: #1e293b; border: 1px solid #334155; color: #f87171;
+      padding: 2px 6px; border-radius: 3px; font-family: monospace;
+    }
+    .close-btn {
+      margin-top: 16px; width: 100%; padding: 8px;
+      background: #dc2626; border: 0; border-radius: 4px;
+      color: #fff; font-weight: 600; cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="topbar-left">
+      <a href="../../index.html" class="back-btn">← Меню</a>
+      <span style="font-size: 13px; font-weight: 600; color: #f87171;">Super Mario 64</span>
+      <span class="game-badge">WASM DECOMP</span>
+      <div class="controls-hint">
+        <span><kbd>Стрелки</kbd> Бег</span>
+        <span><kbd>X</kbd> Прыжок</span>
+        <span><kbd>C</kbd> Удар</span>
+        <span><kbd>Пробел</kbd> Присесть</span>
+        <span><kbd>WASD</kbd> Камера</span>
+        <span><kbd>Enter</kbd> Старт</span>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <button class="tool-btn" onclick="toggleControls()">🎮 Управление</button>
+      <button class="tool-btn" onclick="openAboutBlank()" title="Открыть в чистой вкладке about:blank">🕶️ Скрытый режим</button>
+      <button class="tool-btn" onclick="toggleFullscreen()" title="Полный экран">⛶ Экран</button>
+      <button class="tool-btn panic-btn" onclick="triggerPanic()" title="Паника (\)">🚨 Паника (\)</button>
+    </div>
+  </div>
+
+  <div id="gameContainer">
+    <canvas class="emscripten" id="canvas" tabindex="-1"></canvas>
+
+    <div class="modal-overlay" id="controlsModal" onclick="if(event.target === this) toggleControls()">
+      <div class="modal-box">
+        <h3>Управление Super Mario 64</h3>
+        <p style="color: #94a3b8; font-size: 12px; margin-bottom: 8px;">
+          Порт полностью поддерживает геймпад (Xbox/PlayStation) и клавиатуру. Сохранения автоматически записываются в память браузера (localStorage).
+        </p>
+        <table class="table-controls">
+          <tr><td>Стрелки / Аналог</td><td><kbd>↑ ↓ ← →</kbd> Движение Марио</td></tr>
+          <tr><td>Кнопка A (Прыжок)</td><td><kbd>X</kbd></td></tr>
+          <tr><td>Кнопка B (Удар / Действие)</td><td><kbd>C</kbd></td></tr>
+          <tr><td>Кнопка Z (Присесть / Кувырок)</td><td><kbd>Пробел</kbd></td></tr>
+          <tr><td>Кнопка L / R</td><td><kbd>Q</kbd> / <kbd>E</kbd></td></tr>
+          <tr><td>Камера (C-Buttons)</td><td><kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd></td></tr>
+          <tr><td>Кнопка Start (Пауза / Меню)</td><td><kbd>Enter</kbd></td></tr>
+        </table>
+        <button class="close-btn" onclick="toggleControls()">Вернуться к игре</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    var Module = {
+      preRun: [],
+      postRun: [],
+      print: (function () {
+        return function (text) {
+          if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(" ");
+          console.log(text);
+        };
+      })(),
+      printErr: function (text) {
+        if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(" ");
+        console.error(text);
+      },
+      canvas: (function () {
+        var canvas = document.getElementById("canvas");
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight - 44;
+        canvas.addEventListener(
+          "webglcontextlost",
+          function (e) {
+            alert("WebGL context lost. Перезагрузите страницу.");
+            e.preventDefault();
+          },
+          false
+        );
+        return canvas;
+      })(),
+      setStatus: function (text) {}
+    };
+
+    window.addEventListener('resize', function() {
+      var canvas = document.getElementById("canvas");
+      if (canvas) {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight - 44;
+      }
+    });
+  </script>
+  <script async type="text/javascript" src="sm64.us.f3dex2e.js"></script>
+</body>
+</html>

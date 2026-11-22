@@ -1,0 +1,512 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="description" content="Культовый шутер DOOM в браузере (C/C++ порт Chocolate Doom на WebAssembly). Поддерживает управление клавиатурой, тачскрин и запуск пользовательских WAD." />
+  <title>DOOM (Chocolate Doom WASM) — HW Hub</title>
+  <link rel="icon" type="image/png" href="thumb.png">
+  <script>
+    // Tab Cloaking Sync
+    (function() {
+      const PRESETS = {
+        classroom: { title: "Google Класс", icon: "https://ssl.gstatic.com/classroom/favicon.png" },
+        dnevnik: { title: "Электронный дневник", icon: "https://dnevnik.ru/favicon.ico" },
+        resh: { title: "РЭШ — Российская электронная школа", icon: "https://resh.edu.ru/favicon.ico" },
+        wiki: { title: "Википедия — свободная энциклопедия", icon: "https://ru.wikipedia.org/static/favicon/wikipedia.ico" }
+      };
+      const savedPreset = localStorage.getItem('hwhub_tab_preset');
+      if (savedPreset && PRESETS[savedPreset]) {
+        document.title = PRESETS[savedPreset].title;
+        let link = document.querySelector("link[rel*='icon']");
+        if (!link) {
+          link = document.createElement("link");
+          link.rel = "icon";
+          document.head.appendChild(link);
+        }
+        link.href = PRESETS[savedPreset].icon;
+      }
+    })();
+
+    // Panic Key Handler
+    window.addEventListener('keydown', (e) => {
+      const panicKey = localStorage.getItem('hwhub_panic_key') || '\\';
+      const panicAction = localStorage.getItem('hwhub_panic_action') || 'decoy';
+
+      if (e.key === panicKey) {
+        e.preventDefault();
+        triggerPanic();
+      }
+    });
+
+    function triggerPanic() {
+      const panicAction = localStorage.getItem('hwhub_panic_action') || 'decoy';
+      if (panicAction === 'dnevnik') window.location.replace('https://dnevnik.ru');
+      else if (panicAction === 'wiki') window.location.replace('https://ru.wikipedia.org/wiki/Информатика');
+      else if (panicAction === 'ege') window.location.replace('https://inf-ege.sdamgia.ru/');
+      else window.location.href = '../../index.html';
+    }
+
+    function openAboutBlank() {
+      const win = window.open('about:blank', '_blank');
+      if (!win) {
+        alert('Всплывающее окно заблокировано браузером. Разрешите всплывающие окна.');
+        return;
+      }
+      const iframe = win.document.createElement('iframe');
+      iframe.style.position = 'fixed';
+      iframe.style.top = '0';
+      iframe.style.left = '0';
+      iframe.style.width = '100%';
+      iframe.style.height = '100%';
+      iframe.style.border = 'none';
+      iframe.style.outline = 'none';
+      iframe.src = window.location.href;
+      win.document.body.style.margin = '0';
+      win.document.body.style.height = '100vh';
+      win.document.body.style.overflow = 'hidden';
+      win.document.body.appendChild(iframe);
+      win.document.title = document.title;
+    }
+
+    function toggleFullscreen() {
+      const el = document.getElementById("wrap");
+      if (!document.fullscreenElement) {
+        if (el.requestFullscreen) el.requestFullscreen();
+      } else {
+        if (document.exitFullscreen) document.exitFullscreen();
+      }
+    }
+  </script>
+  <style>
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+    html, body {
+      margin: 0; padding: 0; height: 100%; overflow: hidden;
+      background: #000; color: #cfcfcf;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      -webkit-user-select: none; user-select: none; touch-action: none;
+    }
+
+    /* Top bar */
+    .topbar {
+      height: 44px;
+      background: #11141e;
+      border-bottom: 1px solid #1f2536;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 14px;
+      z-index: 50;
+      flex-shrink: 0;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .back-btn {
+      background: #1b202e;
+      color: #cbd5e1;
+      border: 1px solid #2d374d;
+      padding: 4px 10px;
+      border-radius: 4px;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 500;
+      transition: background 0.15s;
+    }
+    .back-btn:hover { background: #262e45; color: #fff; }
+
+    .game-badge {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      padding: 2px 6px;
+      border-radius: 3px;
+      text-transform: uppercase;
+      background: #dc2626;
+      color: #fef2f2;
+    }
+
+    .controls-hint {
+      font-size: 11px;
+      color: #94a3b8;
+      display: flex;
+      gap: 10px;
+    }
+    .controls-hint kbd {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #f87171;
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-family: inherit;
+      font-size: 10px;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tool-btn {
+      background: #1a202c;
+      border: 1px solid #2d3748;
+      color: #cbd5e0;
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s;
+    }
+    .tool-btn:hover { background: #2d3748; color: #fff; }
+
+    .panic-btn {
+      background: #7f1d1d;
+      border-color: #991b1b;
+      color: #fecaca;
+    }
+    .panic-btn:hover { background: #991b1b; color: #fff; }
+
+    /* Game Wrapper */
+    #wrap { display: flex; flex-direction: column; height: calc(100% - 44px); }
+    #screen { flex: 1; position: relative; min-height: 0; background: #000; }
+    canvas {
+      display: block; width: 100%; height: 100%;
+      object-fit: contain; image-rendering: pixelated; outline: none;
+      background: #000;
+    }
+
+    #boot {
+      position: absolute; inset: 0; z-index: 20;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      background: #08090d; text-align: center; padding: 20px;
+    }
+    #boot.hidden { display: none; }
+    #bootTitle { font-size: 36px; font-weight: 900; letter-spacing: 0.18em; color: #dc2626; text-shadow: 0 0 20px rgba(220,38,38,0.5); }
+    #bootHint { margin-top: 8px; font-size: 13px; color: #94a3b8; }
+    #bootBtn {
+      margin-top: 22px; border: 0; border-radius: 6px; padding: 14px 38px;
+      background: #dc2626; color: #fff; font-size: 16px; font-weight: 700; letter-spacing: 0.1em;
+      cursor: pointer; transition: transform 0.15s, background 0.15s;
+    }
+    #bootBtn:hover:not([disabled]) { background: #ef4444; transform: scale(1.03); }
+    #bootBtn[disabled] { background: #3a2020; color: #8a8a8a; cursor: not-allowed; }
+
+    .custom-wad-row {
+      margin-top: 14px;
+      font-size: 12px;
+      color: #a1a1aa;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .custom-wad-btn {
+      background: #27272a;
+      border: 1px solid #3f3f46;
+      color: #e4e4e7;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 11px;
+      cursor: pointer;
+    }
+    .custom-wad-btn:hover { background: #3f3f46; }
+
+    #log {
+      margin-top: 16px; width: 100%; max-width: 560px; height: 26vh; overflow: auto;
+      background: #0b0b0f; border: 1px solid #1e2538; border-radius: 6px; padding: 8px 12px;
+      font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 11px; line-height: 1.45;
+      color: #8fb98f; text-align: left; white-space: pre-wrap; word-break: break-word;
+    }
+    #log .e { color: #ff8f8f; }
+    #log .i { color: #6ea8ff; }
+
+    /* On-Screen Mobile Pad */
+    #pad { flex: 0 0 auto; padding: 8px 10px 14px; background: #0a0a0e; border-top: 1px solid #1a202c; }
+    #pad.hidden { display: none; }
+    .row { display: flex; gap: 8px; justify-content: center; margin-top: 6px; }
+    .btn {
+      border: 0; border-radius: 8px; background: #1c1f2e; color: #d8d8d8;
+      font-size: 14px; font-weight: 600; height: 46px; min-width: 50px;
+      display: flex; align-items: center; justify-content: center; flex: 1;
+      user-select: none;
+    }
+    .btn:active, .btn.on { background: #dc2626; color: #fff; }
+    .btn.wide { flex: 1.6; }
+    .btn.small { font-size: 11px; letter-spacing: 0.05em; }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="topbar-left">
+      <a href="../../index.html" class="back-btn">← Меню</a>
+      <span style="font-size: 13px; font-weight: 600; color: #f87171;">DOOM (Chocolate Doom)</span>
+      <span class="game-badge">WASM DECOMP</span>
+      <div class="controls-hint">
+        <span><kbd>Стрелки</kbd> / <kbd>WASD</kbd> Ходьба</span>
+        <span><kbd>Ctrl</kbd> Огонь</span>
+        <span><kbd>Пробел</kbd> Использовать</span>
+        <span><kbd>Q</kbd> <kbd>E</kbd> Стрейф</span>
+        <span><kbd>1-7</kbd> Оружие</span>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <button class="tool-btn" id="togglePadBtn" onclick="togglePad()">📱 Тач-кнопки</button>
+      <button class="tool-btn" onclick="openAboutBlank()" title="Открыть в чистой вкладке about:blank">🕶️ Скрытый режим</button>
+      <button class="tool-btn" onclick="toggleFullscreen()" title="Полный экран">⛶ Экран</button>
+      <button class="tool-btn panic-btn" onclick="triggerPanic()" title="Паника (\)">🚨 Паника (\)</button>
+    </div>
+  </div>
+
+  <div id="wrap">
+    <div id="screen">
+      <canvas id="canvas" tabindex="-1" oncontextmenu="event.preventDefault()"></canvas>
+      <div id="boot">
+        <div id="bootTitle">DOOM</div>
+        <div id="bootHint">Freedoom / id Software IWAD &middot; Chocolate Doom (WebAssembly)</div>
+        <button id="bootBtn" type="button" disabled>ЗАГРУЗКА ДВИЖКА…</button>
+
+        <div class="custom-wad-row">
+          <span>Свой WAD:</span>
+          <input type="file" id="wadFile" accept=".wad" style="display:none;" onchange="onCustomWad(event)">
+          <button class="custom-wad-btn" type="button" onclick="document.getElementById('wadFile').click()">Загрузить WAD файл</button>
+          <span id="wadName" style="color: #4ade80;">freedoom1.wad (по умолчанию)</span>
+        </div>
+
+        <div id="log"></div>
+      </div>
+    </div>
+
+    <div id="pad" class="hidden">
+      <div class="row">
+        <button class="btn" data-key="ArrowLeft"  type="button">&#8630;</button>
+        <button class="btn" data-key="ArrowUp"    type="button">&#9650;</button>
+        <button class="btn" data-key="ArrowRight" type="button">&#8631;</button>
+        <button class="btn small" data-key="KeyQ" type="button">&lt; STR</button>
+        <button class="btn small" data-key="KeyE" type="button">STR &gt;</button>
+      </div>
+      <div class="row">
+        <button class="btn wide" data-key="Control"   type="button">FIRE</button>
+        <button class="btn"      data-key="ArrowDown" type="button">&#9660;</button>
+        <button class="btn wide" data-key="Space"     type="button">USE</button>
+      </div>
+      <div class="row">
+        <button class="btn small" id="runToggle" type="button">RUN</button>
+        <button class="btn small" data-key="Digit1" type="button">1</button>
+        <button class="btn small" data-key="Digit2" type="button">2</button>
+        <button class="btn small" data-key="Digit3" type="button">3</button>
+        <button class="btn small" data-key="Enter"  type="button">ENT</button>
+        <button class="btn small" data-key="Escape" type="button">ESC</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    var canvas = document.getElementById('canvas');
+    var boot = document.getElementById('boot');
+    var bootBtn = document.getElementById('bootBtn');
+    var pad = document.getElementById('pad');
+    var logEl = document.getElementById('log');
+
+    var lines = 0;
+    function log(msg, cls) {
+      if (lines++ > 400) { return; }
+      var d = document.createElement('div');
+      if (cls) { d.className = cls; }
+      d.textContent = msg;
+      logEl.appendChild(d);
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+    function info(m) { log(m, 'i'); }
+    function err(m) { log(m, 'e'); }
+
+    window.onerror = function (message, src, line) {
+      err('EXCEPTION: ' + message + ' @' + line);
+      return false;
+    };
+    window.addEventListener('unhandledrejection', function (e) {
+      err('UNHANDLED REJECTION: ' + (e.reason && e.reason.message ? e.reason.message : e.reason));
+    });
+
+    // Touch controls
+    var KEYS = {
+      ArrowUp:    { key: 'ArrowUp',    code: 'ArrowUp',     keyCode: 38 },
+      ArrowDown:  { key: 'ArrowDown',  code: 'ArrowDown',   keyCode: 40 },
+      ArrowLeft:  { key: 'ArrowLeft',  code: 'ArrowLeft',   keyCode: 37 },
+      ArrowRight: { key: 'ArrowRight', code: 'ArrowRight',  keyCode: 39 },
+      Control:    { key: 'Control',    code: 'ControlLeft', keyCode: 17 },
+      Space:      { key: ' ',          code: 'Space',       keyCode: 32 },
+      Shift:      { key: 'Shift',      code: 'ShiftLeft',   keyCode: 16 },
+      Escape:     { key: 'Escape',     code: 'Escape',      keyCode: 27 },
+      Enter:      { key: 'Enter',      code: 'Enter',       keyCode: 13 },
+      KeyQ:       { key: 'q',          code: 'KeyQ',        keyCode: 81 },
+      KeyE:       { key: 'e',          code: 'KeyE',        keyCode: 69 },
+      Digit1:     { key: '1',          code: 'Digit1',      keyCode: 49 },
+      Digit2:     { key: '2',          code: 'Digit2',      keyCode: 50 },
+      Digit3:     { key: '3',          code: 'Digit3',      keyCode: 51 }
+    };
+
+    function send(type, name) {
+      var k = KEYS[name];
+      if (!k) { return; }
+      var ev = new KeyboardEvent(type, {
+        key: k.key, code: k.code, keyCode: k.keyCode, which: k.keyCode,
+        bubbles: true, cancelable: true
+      });
+      try {
+        Object.defineProperty(ev, 'keyCode', { get: function () { return k.keyCode; } });
+        Object.defineProperty(ev, 'which',   { get: function () { return k.keyCode; } });
+      } catch (e) {}
+      document.dispatchEvent(ev);
+      canvas.dispatchEvent(ev);
+    }
+
+    function bindHold(el, name) {
+      var down = false;
+      function press(ev) {
+        ev.preventDefault();
+        if (down) { return; }
+        down = true; el.classList.add('on'); send('keydown', name);
+      }
+      function release(ev) {
+        if (ev && ev.preventDefault) { ev.preventDefault(); }
+        if (!down) { return; }
+        down = false; el.classList.remove('on'); send('keyup', name);
+      }
+      el.addEventListener('touchstart', press, { passive: false });
+      el.addEventListener('touchend', release, { passive: false });
+      el.addEventListener('touchcancel', release, { passive: false });
+      el.addEventListener('mousedown', press);
+      el.addEventListener('mouseup', release);
+      el.addEventListener('mouseleave', release);
+      window.addEventListener('blur', function () { release(null); });
+    }
+
+    var btns = document.querySelectorAll('.btn[data-key]');
+    for (var i = 0; i < btns.length; i++) {
+      bindHold(btns[i], btns[i].getAttribute('data-key'));
+    }
+
+    var runOn = false;
+    var runToggle = document.getElementById('runToggle');
+    runToggle.addEventListener('click', function () {
+      runOn = !runOn;
+      runToggle.classList.toggle('on', runOn);
+      send(runOn ? 'keydown' : 'keyup', 'Shift');
+    });
+
+    window.togglePad = function() {
+      pad.classList.toggle('hidden');
+    };
+
+    // Custom WAD handling
+    var selectedWadName = 'freedoom1.wad';
+    var customWadData = null;
+
+    window.onCustomWad = function(event) {
+      var file = event.target.files[0];
+      if (!file) return;
+      selectedWadName = file.name;
+      document.getElementById('wadName').textContent = file.name + ' (' + (file.size / (1024*1024)).toFixed(1) + ' MB)';
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        customWadData = new Uint8Array(e.target.result);
+        info('[wad] Загружен пользовательский WAD: ' + file.name);
+      };
+      reader.readAsArrayBuffer(file);
+    };
+
+    var PRELOAD = ['freedoom1.wad', 'default.cfg'];
+    var started = false;
+
+    window.Module = {
+      canvas: canvas,
+      noInitialRun: true,
+      noExitRuntime: true,
+
+      print: function (t) { log(String(t)); },
+      printErr: function (t) { err(String(t)); },
+      setStatus: function (t) { if (t) { info('[status] ' + t); } },
+
+      monitorRunDependencies: function (left) {
+        info('[deps] Ожидание ресурсов: ' + left);
+      },
+
+      preRun: function () {
+        try { window.Module.FS.mkdir('/savefiles'); } catch (e) {}
+        PRELOAD.forEach(function (f) {
+          info('[preload] ' + f);
+          window.Module.FS.createPreloadedFile('', f, f, true, true);
+        });
+      },
+
+      onRuntimeInitialized: function () {
+        info('[runtime] Движок инициализирован');
+        bootBtn.disabled = false;
+        bootBtn.textContent = 'ИГРАТЬ';
+      },
+
+      onExit: function (status) {
+        err('[exit] Завершено с кодом ' + status);
+      }
+    };
+
+    bootBtn.addEventListener('click', function () {
+      if (started) { return; }
+      started = true;
+      bootBtn.disabled = true;
+      bootBtn.textContent = 'ЗАПУСК…';
+
+      canvas.focus();
+
+      if (customWadData) {
+        try {
+          window.Module.FS.writeFile('/' + selectedWadName, customWadData);
+          info('[fs] Записан кастомный WAD в VFS: ' + selectedWadName);
+        } catch (e) {
+          err('[fs] Ошибка записи WAD: ' + e);
+        }
+      }
+
+      var args = [
+        '-iwad', selectedWadName,
+        '-window',
+        '-nogui',
+        '-nomusic',
+        '-config', 'default.cfg',
+        '-savedir', '/savefiles'
+      ];
+
+      try {
+        callMain(args);
+        info('[main] Запуск успешен');
+        boot.classList.add('hidden');
+        if (window.innerWidth < 800) {
+          pad.classList.remove('hidden');
+        }
+      } catch (e) {
+        err('[main] Ошибка: ' + (e && e.message ? e.message : e));
+        bootBtn.disabled = false;
+        bootBtn.textContent = 'ПОВТОРИТЬ';
+        started = false;
+      }
+    });
+
+    info('[boot] Загрузка Chocolate Doom WASM…');
+    var s = document.createElement('script');
+    s.src = 'websockets-doom.js';
+    s.onerror = function () { err('[boot] Ошибка загрузки websockets-doom.js'); };
+    document.body.appendChild(s);
+  })();
+  </script>
+</body>
+</html>

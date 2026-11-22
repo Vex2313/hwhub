@@ -398,5 +398,69 @@
     "thumb": "games/tinystrike/thumb.png",
     "size": "6 MB",
     "offline": true
+  },
+  {
+    "id": "space-cadet",
+    "title": "3D Pinball: Space Cadet",
+    "category": "retro",
+    "tags": [
+      "Пинбол",
+      "Windows XP",
+      "WASM",
+      "Декомпиляция"
+    ],
+    "desc": "Культовый 3D-пинбол из Windows 95/XP, полностью воссозданный на C++ декомпиляции и скомпилированный в WebAssembly. Звуки, физика, миссии званий и оригинальное оформление.",
+    "path": "games/space-cadet/index.html",
+    "thumb": "games/space-cadet/thumb.png",
+    "size": "7 MB",
+    "offline": true
+  },
+  {
+    "id": "diablo",
+    "title": "Diablo (DevilutionX)",
+    "category": "story",
+    "tags": [
+      "Экшен-RPG",
+      "Blizzard",
+      "DevilutionX",
+      "Декомпиляция"
+    ],
+    "desc": "Легендарная мрачная экшен-RPG от Blizzard в браузере (C++ декомпиляция DevilutionX на WASM). Включает официальную shareware-версию spawn.mpq (город Тристрам, первые 2 уровня подземелья, класс Воин) и поддержку загрузки retail DIABDAT.MPQ для прохождения всей кампании.",
+    "path": "games/diablo/index.html",
+    "thumb": "games/diablo/thumb.png",
+    "size": "30 MB",
+    "offline": true
+  },
+  {
+    "id": "sm64",
+    "title": "Super Mario 64 (SM64 Port)",
+    "category": "retro",
+    "tags": [
+      "3D Платформер",
+      "Nintendo 64",
+      "Mario",
+      "Декомпиляция"
+    ],
+    "desc": "Революционный 3D-платформер Super Mario 64, портированный прямо в браузер на WebGL/WebAssembly через официальную декомпиляцию движка. 60 FPS, поддержка клавиатуры и геймпадов, сохранение звёзд в браузере.",
+    "path": "games/sm64/index.html",
+    "thumb": "games/sm64/thumb.png",
+    "size": "16 MB",
+    "offline": true
+  },
+  {
+    "id": "doom",
+    "title": "DOOM (Chocolate Doom)",
+    "category": "arcade",
+    "tags": [
+      "Шутер",
+      "DOOM",
+      "FPS",
+      "WASM"
+    ],
+    "desc": "Классический шутер DOOM на движке Chocolate Doom (WebAssembly). Содержит предустановленный Freedoom IWAD, плавную стрельбу, поддержку мобильных тач-кнопок и возможность загрузки любых пользовательских WAD-файлов (DOOM 1, DOOM 2, Plutonia).",
+    "path": "games/doom/index.html",
+    "thumb": "games/doom/thumb.png",
+    "size": "36 MB",
+    "offline": true
   }
 ]
