@@ -339,6 +339,16 @@ const DEFAULT_GAMES = [
     path: "games/touhou8/index.html",
     thumb: "games/touhou8/thumb.png",
     size: "2 MB"
+  },
+  {
+    id: "undertale",
+    title: "Undertale",
+    category: "story",
+    tags: ["RPG", "Undertale", "Сюжет", "WASM", "Шедевр"],
+    desc: "Культовая ролевая игра от Toby Fox в браузере (GameMaker HTML5/WASM Runner). Полная оригинальная версия с уникальной боевой системой, всеми ветками диалогов, концовками (Пацифист, Нейтрал, Геноцид) и полным саундтреком из более чем 100 треков.",
+    path: "games/undertale/index.html",
+    thumb: "games/undertale/thumb.png",
+    size: "190 MB"
   }
 ];
 
